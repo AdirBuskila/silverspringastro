@@ -39,9 +39,9 @@ export default function Hero() {
           priority
           quality={90}
         />
-        {/* Gradient overlays for readability */}
-        <div className="absolute inset-0 bg-gradient-to-l from-space-900 via-space-900/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-space-900 via-transparent to-space-900/50" />
+        {/* Gradient overlays for readability - subtle to show image */}
+        <div className="absolute inset-0 bg-gradient-to-l from-space-900/60 via-space-900/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-space-900/70 via-transparent to-space-900/20" />
       </div>
 
       {/* Animated star particles */}
