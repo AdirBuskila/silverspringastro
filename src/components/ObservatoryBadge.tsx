@@ -25,11 +25,12 @@ export default function ObservatoryBadge({
     md: 'px-2 py-1 text-sm',
   };
 
-  const badgeClasses = {
+  const badgeClasses: Record<ObservatoryCode, string> = {
     H85: 'badge-h85',
     BBO: 'badge-bbo',
     SRO: 'badge-sro',
     G53: 'badge-g53',
+    None: 'bg-space-600',
   };
 
   return (
