@@ -64,9 +64,6 @@ export default function Hero() {
             ))}
           </div>
 
-          {/* Shooting star occasional */}
-          <div className="absolute top-20 left-0 w-1 h-1 bg-white rounded-full animate-shooting-star opacity-0" style={{ animationDelay: '3s' }} />
-          <div className="absolute top-40 left-20 w-1 h-1 bg-white rounded-full animate-shooting-star opacity-0" style={{ animationDelay: '8s' }} />
         </div>
 
         {/* Content */}
