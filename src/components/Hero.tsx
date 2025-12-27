@@ -40,7 +40,7 @@ export default function Hero() {
           quality={90}
         />
         {/* Gradient overlays for readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-space-900 via-space-900/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-l from-space-900 via-space-900/80 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-space-900 via-transparent to-space-900/50" />
       </div>
 
