@@ -19,13 +19,23 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      {/* Ken with Telescope - Main Hero Image */}
+      {/* Ken with Telescope - Responsive Hero Images */}
       <div className="absolute inset-0">
+        {/* Desktop image - positioned to show Ken on the right */}
         <Image
           src="/images/hero/ken-telescope.jpg"
           alt="Ken Levin with his telescope at Silver Spring Observatory"
           fill
-          className="object-cover object-center"
+          className="hidden md:block object-cover object-[75%_center]"
+          priority
+          quality={90}
+        />
+        {/* Mobile image - narrower crop for portrait screens */}
+        <Image
+          src="/images/hero/ken-telescope-mobile.jpg"
+          alt="Ken Levin with his telescope at Silver Spring Observatory"
+          fill
+          className="block md:hidden object-cover object-center"
           priority
           quality={90}
         />
