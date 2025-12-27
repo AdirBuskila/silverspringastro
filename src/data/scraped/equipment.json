@@ -1,0 +1,72 @@
+[
+  {
+    "url": "http://www.silverspringastro.com/new_mount2.jpg",
+    "filename": "new_mount2.jpg",
+    "local_path": "equipment/new_mount2.jpg",
+    "page_source": "https://silverspringastro.com/home.htm",
+    "title": null,
+    "designation": null,
+    "name": null,
+    "category": "equipment",
+    "observatory": null,
+    "filters": null,
+    "description": null,
+    "thumbnail_url": null
+  },
+  {
+    "url": "https://silverspringastro.com/NMscope_thumb.jpg",
+    "filename": "NMscope_thumb.jpg",
+    "local_path": "equipment/NMscope_thumb.jpg",
+    "page_source": "https://silverspringastro.com/home.htm",
+    "title": null,
+    "designation": null,
+    "name": null,
+    "category": "equipment",
+    "observatory": "BBO",
+    "filters": null,
+    "description": "EquipmentWorkWashington Post \nNewspaper Article about KenImages marked 'BBO' are taken fromBlackbird Observatorynear Cloudcroft, New Mexico (now \nat SRO)email Ken Levin:Klevin@aol.com",
+    "thumbnail_url": null
+  },
+  {
+    "url": "https://www.silverspringastro.com/NMscope_thumb.jpg",
+    "filename": "NMscope_thumb.jpg",
+    "local_path": "equipment/NMscope_thumb.jpg",
+    "page_source": "https://www.silverspringastro.com/home.htm",
+    "title": null,
+    "designation": null,
+    "name": null,
+    "category": "equipment",
+    "observatory": "BBO",
+    "filters": null,
+    "description": "EquipmentWorkWashington Post \nNewspaper Article about KenImages marked 'BBO' are taken fromBlackbird Observatorynear Cloudcroft, New Mexico (now \nat SRO)email Ken Levin:Klevin@aol.com",
+    "thumbnail_url": null
+  },
+  {
+    "url": "http://www.silverspringastro.com/familypictures/images/BryceMountain_thumb.jpg",
+    "filename": "BryceMountain_thumb.jpg",
+    "local_path": "equipment/BryceMountain_thumb.jpg",
+    "page_source": "https://silverspringastro.com/familypictures/familypictures.htm",
+    "title": null,
+    "designation": null,
+    "name": null,
+    "category": "equipment",
+    "observatory": null,
+    "filters": null,
+    "description": null,
+    "thumbnail_url": null
+  },
+  {
+    "url": "http://silverspringastro.com/familypictures/images/17DobScope_thumb.jpg",
+    "filename": "17DobScope_thumb.jpg",
+    "local_path": "equipment/17DobScope_thumb.jpg",
+    "page_source": "https://silverspringastro.com/familypictures/familypictures.htm",
+    "title": null,
+    "designation": null,
+    "name": null,
+    "category": "equipment",
+    "observatory": null,
+    "filters": null,
+    "description": null,
+    "thumbnail_url": null
+  }
+]

@@ -1,26 +1,307 @@
 @import "tailwindcss";
 
+/*
+ * Silver Spring Observatory
+ * Dark theme inspired by the night sky and deep space imagery.
+ * 
+ * Color palette:
+ * - Deep space black: #0a0b0f
+ * - Cosmic blue: #0d1117, #161b22
+ * - Nebula accent: #3b82f6, #6366f1
+ * - Star white: #f0f6fc
+ * - Warm star: #fbbf24
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary colors - deep space inspired */
+  --color-space-900: #0a0b0f;
+  --color-space-800: #0d1117;
+  --color-space-700: #161b22;
+  --color-space-600: #21262d;
+  --color-space-500: #30363d;
+  --color-space-400: #484f58;
+  --color-space-300: #6e7681;
+  --color-space-200: #8b949e;
+  --color-space-100: #c9d1d9;
+  --color-space-50: #f0f6fc;
+  
+  /* Accent colors - nebula inspired */
+  --color-nebula-blue: #58a6ff;
+  --color-nebula-purple: #a371f7;
+  --color-nebula-pink: #f778ba;
+  --color-nebula-cyan: #56d4dd;
+  
+  /* Warm accents - star colors */
+  --color-star-warm: #fbbf24;
+  --color-star-red: #f87171;
+  --color-star-orange: #fb923c;
+  
+  /* Background and foreground */
+  --background: var(--color-space-900);
+  --foreground: var(--color-space-50);
+  --muted: var(--color-space-200);
+  --muted-foreground: var(--color-space-300);
+  
+  /* Card styling */
+  --card: var(--color-space-800);
+  --card-hover: var(--color-space-700);
+  --card-border: var(--color-space-600);
+  
+  /* Focus and accent */
+  --ring: var(--color-nebula-blue);
+  --accent: var(--color-nebula-blue);
+  --accent-foreground: var(--color-space-900);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-card-border: var(--card-border);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  /* Space colors */
+  --color-space-900: var(--color-space-900);
+  --color-space-800: var(--color-space-800);
+  --color-space-700: var(--color-space-700);
+  --color-space-600: var(--color-space-600);
+  --color-space-500: var(--color-space-500);
+  --color-space-400: var(--color-space-400);
+  --color-space-300: var(--color-space-300);
+  --color-space-200: var(--color-space-200);
+  --color-space-100: var(--color-space-100);
+  --color-space-50: var(--color-space-50);
+  
+  /* Nebula colors */
+  --color-nebula-blue: var(--color-nebula-blue);
+  --color-nebula-purple: var(--color-nebula-purple);
+  --color-nebula-pink: var(--color-nebula-pink);
+  --color-nebula-cyan: var(--color-nebula-cyan);
+  
+  /* Star colors */
+  --color-star-warm: var(--color-star-warm);
+  --color-star-red: var(--color-star-red);
+  --color-star-orange: var(--color-star-orange);
+  
+  /* Typography */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base styles */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle star field background effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at top, rgba(22, 27, 34, 0.8) 0%, transparent 70%),
+    radial-gradient(circle at 20% 80%, rgba(88, 166, 255, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(163, 113, 247, 0.03) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--color-nebula-blue);
+  color: var(--color-space-900);
+}
+
+/* Focus visible ring */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-space-800);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-space-500);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-space-400);
+}
+
+/* Custom utilities */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-space-50) 0%, var(--color-nebula-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-warm {
+  background: linear-gradient(135deg, var(--color-star-warm) 0%, var(--color-star-orange) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Image hover effect */
+.image-glow {
+  transition: all 0.3s ease;
+}
+
+.image-glow:hover {
+  box-shadow: 
+    0 0 20px rgba(88, 166, 255, 0.2),
+    0 0 40px rgba(88, 166, 255, 0.1);
+}
+
+/* Card hover lift effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-space-700) 0%,
+    var(--color-space-600) 50%,
+    var(--color-space-700) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Backdrop blur for modals */
+.backdrop-blur-heavy {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Observatory badge colors */
+.badge-h85 {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.badge-bbo {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+.badge-sro {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.badge-g53 {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Twinkling star animation */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle ease-in-out infinite;
+}
+
+/* Image zoom on hover for galleries */
+.image-zoom {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.group:hover .image-zoom {
+  transform: scale(1.05);
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* Parallax scroll effect */
+@supports (backdrop-filter: blur(1px)) {
+  .parallax-slow {
+    transform: translateZ(-1px) scale(2);
+  }
+}
+
+/* Glow pulse for featured items */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(88, 166, 255, 0.6);
+  }
+}
+
+.animate-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Star warm color variable */
+:root {
+  --color-star-bright: #fde68a;
 }
