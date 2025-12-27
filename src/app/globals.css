@@ -14,6 +14,7 @@
 
 :root {
   /* Primary colors - deep space inspired */
+  --color-space-950: #050507;
   --color-space-900: #0a0b0f;
   --color-space-800: #0d1117;
   --color-space-700: #161b22;
@@ -66,6 +67,7 @@
   --color-accent-foreground: var(--accent-foreground);
   
   /* Space colors */
+  --color-space-950: var(--color-space-950);
   --color-space-900: var(--color-space-900);
   --color-space-800: var(--color-space-800);
   --color-space-700: var(--color-space-700);
@@ -304,4 +306,39 @@ body::before {
 /* Star warm color variable */
 :root {
   --color-star-bright: #fde68a;
+}
+
+/* Galaxy spin animation */
+@keyframes spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Shooting star animation */
+@keyframes shooting-star {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(0);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(400px) translateY(200px);
+  }
+}
+
+.animate-shooting-star {
+  animation: shooting-star 3s ease-out infinite;
+  background: linear-gradient(90deg, white, transparent);
+  width: 100px;
+  height: 2px;
 }
