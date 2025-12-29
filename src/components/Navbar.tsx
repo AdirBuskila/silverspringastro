@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { mainNavigation, secondaryNavigation } from '@/data/navigation';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 /**
  * Navbar Component
@@ -12,11 +14,30 @@ import { mainNavigation, secondaryNavigation } from '@/data/navigation';
  * - Site branding
  * - Main navigation (astronomical categories)
  * - Secondary navigation (equipment, about)
+ * - Admin link for authenticated users
  * - Mobile responsive hamburger menu
  */
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    // Get initial session
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -95,6 +116,29 @@ export default function Navbar() {
                 {item.label}
               </Link>
             ))}
+
+            {/* Admin link for authenticated users */}
+            {user && (
+              <>
+                <div className="mx-2 h-6 w-px bg-space-600" />
+                <Link
+                  href="/admin"
+                  className={`
+                    px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1.5
+                    ${isActive('/admin')
+                      ? 'text-star-warm bg-space-800'
+                      : 'text-star-warm/80 hover:text-star-warm hover:bg-space-800/50'
+                    }
+                  `}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Admin
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Mobile menu button */}
@@ -179,6 +223,34 @@ export default function Navbar() {
                 {item.label}
               </Link>
             ))}
+
+            {/* Admin link for authenticated users */}
+            {user && (
+              <>
+                <div className="pt-4 mt-4 border-t border-space-700/50">
+                  <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-star-warm/70">
+                    Admin
+                  </p>
+                </div>
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`
+                    block px-3 py-2 text-base font-medium rounded-md transition-colors flex items-center gap-2
+                    ${isActive('/admin')
+                      ? 'text-star-warm bg-space-800'
+                      : 'text-star-warm/80 hover:text-star-warm hover:bg-space-800/50'
+                    }
+                  `}
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Dashboard
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

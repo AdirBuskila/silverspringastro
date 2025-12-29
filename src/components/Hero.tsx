@@ -24,16 +24,17 @@ export default function Hero() {
       <section className="relative w-full bg-space-950">
         {/* Ken's Photo - Full width, no text overlay */}
         <div className="relative w-full h-[60vh] sm:h-[70vh] lg:h-[80vh]">
-          {/* Desktop image */}
+          {/* Desktop image - Ken with blue telescope */}
           <Image
-            src="/images/hero/ken-telescope.jpg"
-            alt="Ken Levin with his telescope"
+            src="/images/hero/ken-telescope-desktop.jpg"
+            alt="Ken Levin with his 17-inch Cassegrain telescope"
             fill
-            className="object-cover object-[75%_center] hidden sm:block"
+            className="object-cover object-[70%_center] hidden sm:block"
             priority
-            quality={90}
+            quality={95}
+            sizes="100vw"
           />
-          {/* Mobile image */}
+          {/* Mobile image - Cropped for portrait view */}
           <Image
             src="/images/hero/ken-telescope-mobile.jpg"
             alt="Ken Levin with his telescope"
