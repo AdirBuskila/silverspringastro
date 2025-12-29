@@ -41,3 +41,5 @@ images = find_all_images(soup, url)
 for typ, img in images:
     print(f"  [{typ}] {img}")
 
+
+

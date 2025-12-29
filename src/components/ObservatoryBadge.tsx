@@ -30,6 +30,7 @@ export default function ObservatoryBadge({
     BBO: 'badge-bbo',
     SRO: 'badge-sro',
     G53: 'badge-g53',
+    TAS: 'badge-tas',
     None: 'bg-space-600',
   };
 

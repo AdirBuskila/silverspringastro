@@ -42,6 +42,15 @@ export const observatories: Observatory[] = [
     description: 'Alder Springs Observatory (G53) - an additional remote imaging location.',
     active: true,
   },
+  {
+    code: 'TAS',
+    name: 'Texas Dark Site',
+    fullName: 'Texas Astronomical Society Dark Site',
+    location: 'Oklahoma',
+    description: 'New observatory being built at the Texas Astronomical Society dark site in Oklahoma. Features the same telescope setup, providing access to pristine dark skies.',
+    active: true,
+    url: 'https://www.texasastro.org/',
+  },
 ];
 
 /**

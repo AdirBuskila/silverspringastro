@@ -19,3 +19,5 @@ for img in soup.find_all('img'):
     if src:
         print(f"  {src}")
 
+
+

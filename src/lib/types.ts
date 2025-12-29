@@ -17,7 +17,7 @@ export type Category =
   | 'exoplanets';
 
 // Observatory codes used throughout the original site
-export type ObservatoryCode = 'H85' | 'BBO' | 'SRO' | 'G53' | 'None';
+export type ObservatoryCode = 'H85' | 'BBO' | 'SRO' | 'G53' | 'TAS' | 'None';
 
 /**
  * Astronomical Image
