@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import ImageGrid from '@/components/ImageGrid';
-import { getImagesByCategory } from '@/data/images';
+import { getImagesByCategory } from '@/lib/data';
 import { getCategoryBySlug } from '@/data/categories';
 
 const category = getCategoryBySlug('exoplanets')!;
@@ -12,13 +12,15 @@ export const metadata: Metadata = {
   description: category.description,
 };
 
+export const revalidate = 60;
+
 /**
  * Exoplanets Gallery Page
  * 
  * Features exoplanet transit photometry observations
  */
-export default function ExoplanetsPage() {
-  const images = getImagesByCategory('exoplanets');
+export default async function ExoplanetsPage() {
+  const images = await getImagesByCategory('exoplanets');
 
   return (
     <Container className="py-8">

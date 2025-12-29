@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import ImageGrid from '@/components/ImageGrid';
-import { getImagesByCategory } from '@/data/images';
+import { getImagesByCategory } from '@/lib/data';
 import { getCategoryBySlug } from '@/data/categories';
 
 const category = getCategoryBySlug('galaxy-clusters')!;
@@ -12,11 +12,13 @@ export const metadata: Metadata = {
   description: category.description,
 };
 
+export const revalidate = 60;
+
 /**
  * Galaxy Clusters Gallery Page
  */
-export default function GalaxyClustersPage() {
-  const images = getImagesByCategory('galaxy-clusters');
+export default async function GalaxyClustersPage() {
+  const images = await getImagesByCategory('galaxy-clusters');
 
   return (
     <Container className="py-8">
@@ -32,4 +34,3 @@ export default function GalaxyClustersPage() {
     </Container>
   );
 }
-

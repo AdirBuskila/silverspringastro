@@ -91,20 +91,39 @@ export default function ImageUploadForm({ onSuccess }: ImageUploadFormProps) {
         .from('images')
         .getPublicUrl(fileName);
 
-      // Insert image record into database
-      const { error: dbError } = await supabase
-        .from('images')
-        .insert({
-          designation: formData.designation,
-          name: formData.name || null,
-          category: formData.category,
-          observatory: formData.observatory,
-          filters: formData.filters || null,
-          description: formData.description || null,
-          image_path: publicUrl,
-          thumbnail_path: publicUrl, // Same for now, could generate thumbnails later
-          featured: formData.featured,
-        });
+      // Insert image record into appropriate database table
+      let dbError;
+      
+      if (formData.category === 'travel') {
+        // Travel photos go into the travel_photos table
+        const { error } = await supabase
+          .from('travel_photos')
+          .insert({
+            title: formData.designation, // Use designation as title for travel
+            location: formData.name || 'Unknown Location',
+            image_path: publicUrl,
+            thumbnail_path: publicUrl,
+            description: formData.description || null,
+            album: formData.filters || 'General', // Use filters field as album for travel
+          });
+        dbError = error;
+      } else {
+        // Astronomy images go into the images table
+        const { error } = await supabase
+          .from('images')
+          .insert({
+            designation: formData.designation,
+            name: formData.name || null,
+            category: formData.category,
+            observatory: formData.observatory,
+            filters: formData.filters || null,
+            description: formData.description || null,
+            image_path: publicUrl,
+            thumbnail_path: publicUrl,
+            featured: formData.featured,
+          });
+        dbError = error;
+      }
 
       if (dbError) {
         throw dbError;

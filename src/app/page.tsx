@@ -2,10 +2,12 @@ import Container from '@/components/Container';
 import Hero from '@/components/Hero';
 import FeaturedGallery from '@/components/FeaturedGallery';
 import CategoryCard from '@/components/CategoryCard';
-import { getFeaturedImages, getImagesByCategory } from '@/data/images';
+import { getFeaturedImages, getCategoryImageCount } from '@/lib/data';
 import { categories } from '@/data/categories';
 import { observatories } from '@/data/observatories';
 import { siteInfo } from '@/data/site';
+
+export const revalidate = 60;
 
 /**
  * Homepage
@@ -16,14 +18,16 @@ import { siteInfo } from '@/data/site';
  * - A few featured images
  * - Observatory information including Texas
  */
-export default function HomePage() {
-  const featuredImages = getFeaturedImages().slice(0, 4); // Only 4 images before links
+export default async function HomePage() {
+  const featuredImages = (await getFeaturedImages()).slice(0, 4); // Only 4 images before links
   
-  // Get image counts for each category
-  const categoryCounts = categories.map(cat => ({
-    category: cat,
-    count: getImagesByCategory(cat.slug).length,
-  }));
+  // Get image counts for each category (in parallel)
+  const categoryCounts = await Promise.all(
+    categories.map(async (cat) => ({
+      category: cat,
+      count: await getCategoryImageCount(cat.slug),
+    }))
+  );
 
   return (
     <>

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import ImageGrid from '@/components/ImageGrid';
-import { getImagesByCategory } from '@/data/images';
+import { getImagesByCategory } from '@/lib/data';
 import { getCategoryBySlug } from '@/data/categories';
 
 const category = getCategoryBySlug('asteroids')!;
@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   title: category.pluralTitle,
   description: category.description,
 };
+
+export const revalidate = 60;
 
 // Asteroid discovery data from original site
 const asteroidDiscoveries = [
@@ -43,8 +45,8 @@ const asteroidStats = {
  * 
  * Features asteroid observations including the named asteroid (99862) Kenlevin.
  */
-export default function AsteroidsPage() {
-  const images = getImagesByCategory('asteroids');
+export default async function AsteroidsPage() {
+  const images = await getImagesByCategory('asteroids');
 
   return (
     <Container className="py-8">

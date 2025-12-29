@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import ImageGrid from '@/components/ImageGrid';
-import { getImagesByCategory } from '@/data/images';
+import { getImagesByCategory } from '@/lib/data';
 import { getCategoryBySlug } from '@/data/categories';
 
 const category = getCategoryBySlug('supernovae')!;
@@ -12,11 +12,13 @@ export const metadata: Metadata = {
   description: category.description,
 };
 
+export const revalidate = 60;
+
 /**
  * Supernovae Gallery Page
  */
-export default function SupernovaePage() {
-  const images = getImagesByCategory('supernovae');
+export default async function SupernovaePage() {
+  const images = await getImagesByCategory('supernovae');
 
   return (
     <Container className="py-8">
@@ -32,4 +34,3 @@ export default function SupernovaePage() {
     </Container>
   );
 }
-
