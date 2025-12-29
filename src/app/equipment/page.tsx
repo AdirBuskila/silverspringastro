@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import { observatories } from '@/data/observatories';
@@ -7,6 +8,25 @@ export const metadata: Metadata = {
   title: 'Equipment',
   description: 'Telescopes, cameras, and equipment used at Silver Spring Observatory for CCD astro-imaging.',
 };
+
+// Equipment images from public/images/equipment
+const equipmentImages = [
+  {
+    src: '/images/equipment/NMscope.jpg',
+    title: 'New Mexico Telescope Setup',
+    description: 'Primary imaging telescope at the Blackbird Observatory in New Mexico.',
+  },
+  {
+    src: '/images/equipment/new_mount2.jpg',
+    title: 'German Equatorial Mount',
+    description: 'Precision mount for accurate tracking during long-exposure imaging.',
+  },
+  {
+    src: '/images/equipment/17DobScope.jpg',
+    title: '17" Dobsonian Telescope',
+    description: 'Large aperture Dobsonian telescope for visual observation and wide-field imaging.',
+  },
+];
 
 /**
  * Equipment Page
@@ -24,6 +44,33 @@ export default function EquipmentPage() {
       />
 
       <div className="py-8 space-y-12">
+        {/* Equipment Gallery */}
+        <section>
+          <h2 className="text-2xl font-bold text-space-50 mb-6">Equipment Gallery</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {equipmentImages.map((img, index) => (
+              <div 
+                key={index}
+                className="group relative rounded-xl overflow-hidden bg-space-800/50 border border-space-700/50"
+              >
+                <div className="aspect-[4/3] relative">
+                  <Image
+                    src={img.src}
+                    alt={img.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-space-50 mb-1">{img.title}</h3>
+                  <p className="text-sm text-space-400">{img.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Current Setup */}
         <section>
           <h2 className="text-2xl font-bold text-space-50 mb-6">Current Setup</h2>
@@ -42,9 +89,6 @@ export default function EquipmentPage() {
                 Primary imaging telescope for deep sky observations. Optimized for CCD imaging 
                 with high-quality optics and precise tracking.
               </p>
-              <div className="text-sm text-space-400">
-                <p>Details from original site equipment page to be added.</p>
-              </div>
             </div>
 
             {/* Mount */}
@@ -61,9 +105,6 @@ export default function EquipmentPage() {
                 German equatorial mount with precise tracking for long-exposure imaging.
                 Computer-controlled for automated targeting and guiding.
               </p>
-              <div className="text-sm text-space-400">
-                <p>Details from original site equipment page to be added.</p>
-              </div>
             </div>
 
             {/* Camera */}
@@ -81,9 +122,6 @@ export default function EquipmentPage() {
                 Cooled CCD camera for deep sky imaging. Low noise and high sensitivity 
                 for capturing faint astronomical objects.
               </p>
-              <div className="text-sm text-space-400">
-                <p>Details from original site equipment page to be added.</p>
-              </div>
             </div>
 
             {/* Filters */}
@@ -129,6 +167,7 @@ export default function EquipmentPage() {
                     ${obs.code === 'BBO' ? 'badge-bbo' : ''}
                     ${obs.code === 'SRO' ? 'badge-sro' : ''}
                     ${obs.code === 'G53' ? 'badge-g53' : ''}
+                    ${obs.code === 'TAS' ? 'badge-tas' : ''}
                     text-white flex-shrink-0
                   `}>
                     {obs.code}
@@ -166,6 +205,31 @@ export default function EquipmentPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                       </a>
+                    )}
+                    
+                    {/* Texas Observatory Photos */}
+                    {obs.code === 'TAS' && (
+                      <div className="mt-6">
+                        <h4 className="text-sm font-semibold text-space-200 mb-3">Observatory Photos</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {[
+                            { src: '/images/observatories/20240818_193542.jpg', alt: 'Texas Dark Site - Sunset View' },
+                            { src: '/images/observatories/20250803_124230.jpg', alt: 'Texas Dark Site - Observatory Setup' },
+                            { src: '/images/observatories/20251102_164430.jpg', alt: 'Texas Dark Site - Telescope Setup' },
+                            { src: '/images/observatories/Ken.jpg', alt: 'Ken at Texas Dark Site' },
+                          ].map((img, idx) => (
+                            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden bg-space-700">
+                              <Image
+                                src={img.src}
+                                alt={img.alt}
+                                fill
+                                className="object-cover hover:scale-105 transition-transform duration-300"
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

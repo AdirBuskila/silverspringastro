@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import Container from '@/components/Container';
 import Hero from '@/components/Hero';
 import FeaturedGallery from '@/components/FeaturedGallery';
@@ -6,6 +8,14 @@ import { getFeaturedImages, getCategoryImageCount } from '@/lib/data';
 import { categories } from '@/data/categories';
 import { observatories } from '@/data/observatories';
 import { siteInfo } from '@/data/site';
+
+// Texas Observatory images
+const texasObservatoryImages = [
+  { src: '/images/observatories/20240818_193542.jpg', alt: 'Texas Dark Site - Sunset View' },
+  { src: '/images/observatories/20250803_124230.jpg', alt: 'Texas Dark Site - Observatory Setup' },
+  { src: '/images/observatories/20251102_164430.jpg', alt: 'Texas Dark Site - Telescope Setup' },
+  { src: '/images/observatories/Ken.jpg', alt: 'Ken at Texas Dark Site' },
+];
 
 export const revalidate = 60;
 
@@ -70,20 +80,100 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* Observatory Information */}
+      {/* Texas Observatory - Featured Section */}
+      <section className="py-14 sm:py-20 bg-gradient-to-b from-amber-950/20 via-space-900 to-space-900">
+        <Container>
+          <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+              <div className="flex items-center gap-4">
+                <span className="badge-tas px-4 py-2 text-lg font-bold text-white rounded-xl">
+                  TAS
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-space-50">
+                      Texas Astronomical Society Dark Site
+                    </h2>
+                    <span className="bg-green-900/30 text-green-400 border border-green-700/50 text-xs px-2 py-0.5 rounded-full">
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-space-400 mt-1">📍 Oklahoma</p>
+                </div>
+              </div>
+              <Link
+                href="/equipment"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600/20 border border-amber-500/30 text-amber-400 hover:bg-amber-600/30 transition-colors text-sm font-medium"
+              >
+                View Equipment
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+
+            {/* Description */}
+            <p className="text-space-300 text-lg mb-8 max-w-3xl">
+              Our newest observatory location at the Texas Astronomical Society dark site in Oklahoma. 
+              Features the same telescope setup, providing access to pristine dark skies for exceptional deep sky imaging.
+            </p>
+
+            {/* Photo Gallery */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {texasObservatoryImages.map((img, idx) => (
+                <div 
+                  key={idx} 
+                  className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-space-800 border border-space-700/50 hover:border-amber-500/50 transition-colors"
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="absolute bottom-3 left-3 right-3 text-white text-sm font-medium">
+                      {img.alt}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Link to Texas Astro */}
+            <div className="mt-8 flex justify-center">
+              <a
+                href="https://www.texasastro.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                Visit Texas Astronomical Society
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Other Observatories */}
       <section className="py-14 sm:py-16 bg-space-900/30">
         <Container>
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-space-50 mb-3">
-              Observatories
+              All Observatory Locations
             </h2>
             <p className="text-space-300 max-w-2xl mx-auto">
-              Images captured from multiple observatory locations over 25+ years
+              Images captured from multiple observatory locations over 25+ years of astrophotography
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
-            {observatories.map((obs) => (
+            {observatories.filter(obs => obs.code !== 'TAS').map((obs) => (
               <div 
                 key={obs.code}
                 className="p-5 rounded-xl bg-space-800/50 border border-space-700/50 hover:border-space-600/50 transition-colors"
@@ -95,7 +185,6 @@ export default async function HomePage() {
                     ${obs.code === 'BBO' ? 'badge-bbo' : ''}
                     ${obs.code === 'SRO' ? 'badge-sro' : ''}
                     ${obs.code === 'G53' ? 'badge-g53' : ''}
-                    ${obs.code === 'TAS' ? 'badge-tas' : ''}
                     text-white
                   `}>
                     {obs.code}

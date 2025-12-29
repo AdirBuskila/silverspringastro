@@ -1,0 +1,20 @@
+# robots.txt for Silver Spring Observatory
+# https://www.silverspringastro.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.silverspringastro.com/sitemap.xml
+
+# Allow all crawlers to index the site
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block admin pages from indexing
+Disallow: /admin
+Disallow: /api/
+

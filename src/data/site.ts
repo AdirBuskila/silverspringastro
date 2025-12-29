@@ -55,8 +55,27 @@ export const siteInfo = {
 export const seoDefaults = {
   siteName: 'Silver Spring Observatory',
   title: 'Silver Spring Observatory | CCD Astro-Imaging',
-  description: 'Deep sky astrophotography by Ken Levin. Galaxies, nebulae, star clusters, supernovae and more captured from personal and remote observatories.',
-  keywords: ['astrophotography', 'astronomy', 'CCD imaging', 'galaxies', 'nebulae', 'deep sky', 'Silver Spring Observatory', 'Ken Levin'],
+  description: 'Deep sky astrophotography by Ken Levin. Galaxies, nebulae, star clusters, supernovae and more captured from personal and remote observatories using CCD imaging.',
+  keywords: [
+    'astrophotography', 
+    'astronomy', 
+    'CCD imaging', 
+    'galaxies', 
+    'nebulae', 
+    'deep sky', 
+    'Silver Spring Observatory', 
+    'Ken Levin',
+    'telescope imaging',
+    'deep sky objects',
+    'star clusters',
+    'supernovae',
+    'amateur astronomy',
+    'cassegrain telescope',
+    'astronomical objects',
+  ],
   author: 'Ken Levin',
+  siteUrl: 'https://www.silverspringastro.com',
+  twitterHandle: undefined, // Add if Ken has a Twitter/X account
+  ogImage: '/images/hero/ken-telescope-desktop.jpg',
 };
 
