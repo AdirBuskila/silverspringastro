@@ -6,7 +6,6 @@ import { getFeaturedImages, getImagesByCategory } from '@/data/images';
 import { categories } from '@/data/categories';
 import { observatories } from '@/data/observatories';
 import { siteInfo } from '@/data/site';
-import Image from 'next/image';
 
 /**
  * Homepage
@@ -133,63 +132,6 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* NEW: Texas Observatory Project Section */}
-      <section className="py-14 sm:py-16">
-        <Container>
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-nebula-blue/10 rounded-full border border-nebula-blue/30 mb-4">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                <span className="text-nebula-cyan text-sm font-medium">New Project - 2025</span>
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-space-50 mb-3">
-                Texas Astronomical Society Dark Site
-              </h2>
-              <p className="text-space-300 max-w-2xl mx-auto">
-                Building a new observatory with the same telescope at the TAS dark site in Oklahoma — 
-                continuing the legacy of deep sky imaging under pristine dark skies.
-              </p>
-            </div>
-
-            {/* Observatory construction photos */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Ken with telescope photo */}
-              <div className="relative aspect-[3/4] rounded-xl overflow-hidden group">
-                <Image
-                  src="/images/observatories/texas-telescope.jpg"
-                  alt="Ken Levin with the telescope at Texas site"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-space-950/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-space-100 font-medium">Setting up the telescope</p>
-                  <p className="text-space-400 text-sm">Texas Astronomical Society Dark Site</p>
-                </div>
-              </div>
-
-              {/* Observatory building photo */}
-              <div className="relative aspect-[3/4] rounded-xl overflow-hidden group">
-                <Image
-                  src="/images/observatories/texas-building.jpg"
-                  alt="Observatory building at Texas dark site"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-space-950/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-space-100 font-medium">Observatory building</p>
-                  <p className="text-space-400 text-sm">Under construction - Oklahoma</p>
-                </div>
-              </div>
-            </div>
           </div>
         </Container>
       </section>
