@@ -126,9 +126,9 @@ export default function AboutPage() {
               </div>
             </div>
             
-            <div className="relative pl-8">
+            <div className="relative pl-8 border-l-2 border-space-700">
               <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-green-500" />
-              <div>
+              <div className="pb-8">
                 <h3 className="font-semibold text-space-50 mb-1">Sierra Remote Observatories (SRO)</h3>
                 <p className="text-sm text-space-400 mb-2">Sierra Nevada, California</p>
                 <p className="text-space-300 mb-3">
@@ -143,6 +143,35 @@ export default function AboutPage() {
                   className="inline-flex items-center gap-1 text-sm text-nebula-blue hover:text-nebula-cyan transition-colors"
                 >
                   Visit Sierra Remote Observatories
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            
+            <div className="relative pl-8">
+              <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-amber-500 animate-pulse" />
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-space-50">Texas Astronomical Society Dark Site (TAS)</h3>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    Upgrading
+                  </span>
+                </div>
+                <p className="text-sm text-space-400 mb-2">Oklahoma</p>
+                <p className="text-space-300 mb-3">
+                  New observatory currently being upgraded at the Texas Astronomical Society dark site. 
+                  Features the same telescope setup as SRO, providing access to pristine dark skies 
+                  and excellent imaging conditions.
+                </p>
+                <a 
+                  href="https://www.texasastro.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sm text-nebula-blue hover:text-nebula-cyan transition-colors"
+                >
+                  Visit Texas Astronomical Society
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
@@ -165,10 +194,24 @@ export default function AboutPage() {
               <p className="text-sm text-space-400 mb-2">
                 Featured article about amateur astronomy work
               </p>
-              <p className="text-space-300 text-sm">
+              <p className="text-space-300 text-sm mb-3">
                 Ken Levin was featured in the Washington Post for his work in amateur astronomy 
                 and astrophotography from his home observatory.
               </p>
+              <a
+                href="/images/travel/articleKen.jpg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-nebula-blue hover:text-nebula-cyan transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                View newspaper article
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
             </div>
           </div>
         </section>
