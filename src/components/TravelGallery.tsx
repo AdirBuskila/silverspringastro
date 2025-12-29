@@ -12,30 +12,44 @@ interface TravelGalleryProps {
  * TravelGallery Component
  * 
  * Grid gallery for travel/family photos with lightbox view.
+ * Uses full-resolution images in lightbox, falls back to thumbnail if not available.
  */
 export default function TravelGallery({ photos }: TravelGalleryProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<TravelPhoto | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [lightboxImageSrc, setLightboxImageSrc] = useState<string>('');
 
   const handlePhotoClick = (photo: TravelPhoto, index: number) => {
     setSelectedPhoto(photo);
     setSelectedIndex(index);
+    // Start with the full-res image path
+    setLightboxImageSrc(photo.imagePath);
   };
 
   const handleClose = () => {
     setSelectedPhoto(null);
+    setLightboxImageSrc('');
   };
 
   const handlePrevious = () => {
     const newIndex = selectedIndex > 0 ? selectedIndex - 1 : photos.length - 1;
     setSelectedIndex(newIndex);
     setSelectedPhoto(photos[newIndex]);
+    setLightboxImageSrc(photos[newIndex].imagePath);
   };
 
   const handleNext = () => {
     const newIndex = selectedIndex < photos.length - 1 ? selectedIndex + 1 : 0;
     setSelectedIndex(newIndex);
     setSelectedPhoto(photos[newIndex]);
+    setLightboxImageSrc(photos[newIndex].imagePath);
+  };
+
+  // Fallback to thumbnail if full-res image fails to load
+  const handleImageError = () => {
+    if (selectedPhoto && lightboxImageSrc !== selectedPhoto.thumbnailPath) {
+      setLightboxImageSrc(selectedPhoto.thumbnailPath);
+    }
   };
 
   // Handle keyboard navigation
@@ -140,13 +154,14 @@ export default function TravelGallery({ photos }: TravelGalleryProps) {
           >
             <div className="relative w-full max-w-full sm:max-w-5xl">
               <Image
-                src={selectedPhoto.imagePath}
+                src={lightboxImageSrc || selectedPhoto.imagePath}
                 alt={selectedPhoto.title}
                 width={1200}
                 height={800}
                 className="w-full h-auto max-h-[70vh] sm:max-h-[75vh] object-contain rounded-lg"
                 priority
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+                onError={handleImageError}
               />
               
               {/* Photo info */}
