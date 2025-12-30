@@ -183,6 +183,15 @@ export const travelPhotos: TravelPhoto[] = [
     album: 'Family',
   },
   {
+    id: 'travel-family-2003',
+    title: 'Family Photo',
+    location: 'Home',
+    date: '2003',
+    imagePath: '/images/travel/family2003.jpg',
+    thumbnailPath: '/images/travel/family2003.jpg',
+    album: 'Family',
+  },
+  {
     id: 'travel-ken-2008',
     title: 'Ken',
     location: 'Home',

@@ -1,60 +1,120 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { CategoryInfo } from '@/lib/types';
 
 /**
  * CategoryCard Component
  * 
  * Card for displaying a category link with visual appeal.
- * Used on homepage for browsing different astronomical categories.
+ * Uses actual astronomy images as backgrounds for each category.
  */
 interface CategoryCardProps {
   category: CategoryInfo;
   imageCount: number;
 }
 
-// Color gradients for each category
-const categoryGradients: Record<string, string> = {
-  'galaxies': 'from-blue-600/30 via-purple-600/20 to-pink-600/10',
-  'galaxy-clusters': 'from-purple-600/30 via-indigo-600/20 to-blue-600/10',
-  'star-clusters': 'from-yellow-600/30 via-orange-600/20 to-red-600/10',
-  'nebulae': 'from-pink-600/30 via-red-600/20 to-orange-600/10',
-  'supernovae': 'from-red-600/30 via-orange-600/20 to-yellow-600/10',
-  'asteroids': 'from-cyan-600/30 via-teal-600/20 to-green-600/10',
-  'exoplanets': 'from-teal-600/30 via-cyan-600/20 to-blue-600/10',
+// Background images for each category - iconic images from the collection
+const categoryImages: Record<string, string> = {
+  'galaxies': '/images/galaxies/M51_LRGB_H85.jpg',
+  'galaxy-clusters': '/images/galaxy-clusters/Arp319_LRGB_BBO.jpg',
+  'star-clusters': '/images/star-clusters/M13_LRGB_H85.jpg',
+  'nebulae': '/images/nebulae/M27_LRGB_H85.jpg',
+  'supernovae': '/images/supernovae/SN2008ax_LRGB_H85.jpg',
+  'asteroids': '/images/asteroids/20051124_Fixed1a.jpg',
+  'exoplanets': '/images/exoplanets/HD189733.jpg',
+};
+
+// Sophisticated space-themed color palette
+// Muted, elegant colors that evoke the cosmos without being childish
+// Mobile: always colored | Desktop: white, colored on hover
+const categoryAccents: Record<string, { border: string; text: string; arrow: string }> = {
+  'galaxies': { 
+    // Indigo - deep space, spiral arms
+    border: 'border-indigo-400/40 sm:border-space-700/50 group-hover:border-indigo-400/60', 
+    text: 'text-indigo-300 sm:text-white sm:group-hover:text-indigo-300',
+    arrow: 'text-indigo-400 sm:text-space-300 sm:group-hover:text-indigo-300'
+  },
+  'galaxy-clusters': { 
+    // Violet - cosmic mystery, vast distances
+    border: 'border-violet-400/40 sm:border-space-700/50 group-hover:border-violet-400/60', 
+    text: 'text-violet-300 sm:text-white sm:group-hover:text-violet-300',
+    arrow: 'text-violet-400 sm:text-space-300 sm:group-hover:text-violet-300'
+  },
+  'star-clusters': { 
+    // Amber - warm starlight, golden glow
+    border: 'border-amber-400/40 sm:border-space-700/50 group-hover:border-amber-400/60', 
+    text: 'text-amber-200 sm:text-white sm:group-hover:text-amber-200',
+    arrow: 'text-amber-400 sm:text-space-300 sm:group-hover:text-amber-300'
+  },
+  'nebulae': { 
+    // Rose - emission nebulae glow
+    border: 'border-rose-400/40 sm:border-space-700/50 group-hover:border-rose-400/60', 
+    text: 'text-rose-300 sm:text-white sm:group-hover:text-rose-300',
+    arrow: 'text-rose-400 sm:text-space-300 sm:group-hover:text-rose-300'
+  },
+  'supernovae': { 
+    // Orange/coral - stellar explosions, energy
+    border: 'border-orange-400/40 sm:border-space-700/50 group-hover:border-orange-400/60', 
+    text: 'text-orange-200 sm:text-white sm:group-hover:text-orange-200',
+    arrow: 'text-orange-400 sm:text-space-300 sm:group-hover:text-orange-300'
+  },
+  'asteroids': { 
+    // Slate - rocky bodies, cool and neutral
+    border: 'border-slate-400/40 sm:border-space-700/50 group-hover:border-slate-400/60', 
+    text: 'text-slate-300 sm:text-white sm:group-hover:text-slate-300',
+    arrow: 'text-slate-400 sm:text-space-300 sm:group-hover:text-slate-300'
+  },
+  'exoplanets': { 
+    // Sky blue - other worlds, discovery
+    border: 'border-sky-400/40 sm:border-space-700/50 group-hover:border-sky-400/60', 
+    text: 'text-sky-300 sm:text-white sm:group-hover:text-sky-300',
+    arrow: 'text-sky-400 sm:text-space-300 sm:group-hover:text-sky-300'
+  },
 };
 
 export default function CategoryCard({ category, imageCount }: CategoryCardProps) {
-  const gradient = categoryGradients[category.slug] || 'from-space-700 to-space-800';
+  const backgroundImage = categoryImages[category.slug];
+  const accent = categoryAccents[category.slug] || { 
+    border: 'group-hover:border-space-500', 
+    text: 'text-white', 
+    arrow: 'text-space-300' 
+  };
 
   return (
     <Link
       href={`/${category.slug}`}
-      className="group relative overflow-hidden rounded-xl bg-space-800 border border-space-700/50 p-6 card-hover"
+      className={`group relative overflow-hidden rounded-xl bg-space-900 border border-space-700/50 ${accent.border} transition-all duration-300 card-hover`}
     >
-      {/* Background gradient */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
+      {/* Background Image */}
+      {backgroundImage && (
+        <div className="absolute inset-0">
+          <Image
+            src={backgroundImage}
+            alt={category.pluralTitle}
+            fill
+            className="object-cover opacity-70 group-hover:opacity-90 group-hover:scale-110 transition-all duration-500"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 15vw"
+          />
+        </div>
+      )}
       
-      {/* Decorative elements */}
-      <div className="absolute top-4 right-4 opacity-20 group-hover:opacity-40 transition-opacity">
-        <svg className="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-        </svg>
-      </div>
+      {/* Dark overlay for text readability - lighter to show more image */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/80 group-hover:via-black/20 transition-all duration-300" />
 
       {/* Content */}
-      <div className="relative z-10">
-        <h3 className="text-xl font-bold text-space-50 mb-2 group-hover:text-nebula-blue transition-colors">
+      <div className="relative z-10 p-5 h-full flex flex-col justify-end min-h-[160px]">
+        <h3 className={`text-lg sm:text-xl font-bold mb-1.5 ${accent.text} transition-colors drop-shadow-lg`}>
           {category.pluralTitle}
         </h3>
-        <p className="text-sm text-space-300 line-clamp-2 mb-4">
+        <p className="text-xs sm:text-sm text-space-200 line-clamp-2 mb-3 drop-shadow">
           {category.description}
         </p>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-space-400">
+          <span className="text-xs text-space-300 bg-space-900/60 px-2 py-0.5 rounded-full">
             {imageCount} {imageCount === 1 ? 'image' : 'images'}
           </span>
           <svg 
-            className="w-5 h-5 text-space-400 group-hover:text-nebula-blue group-hover:translate-x-1 transition-all" 
+            className={`w-5 h-5 ${accent.arrow} group-hover:translate-x-1 transition-all`}
             fill="none" 
             viewBox="0 0 24 24" 
             stroke="currentColor"
