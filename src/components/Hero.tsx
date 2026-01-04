@@ -108,9 +108,9 @@ export default function Hero() {
         <div className={`relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           {/* Main title */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6">
-            <span className="text-space-50 drop-shadow-lg">Silver Spring</span>
+            <span className="text-white drop-shadow-lg">Silver Spring</span>
             <br />
-            <span className="text-gradient drop-shadow-lg">Observatory</span>
+            <span className="text-white drop-shadow-lg">Observatory</span>
           </h1>
 
           {/* Subtitle */}
