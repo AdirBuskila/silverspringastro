@@ -102,7 +102,7 @@ export default function EquipmentPage() {
                 <h3 className="text-lg font-semibold text-space-50">Mount</h3>
               </div>
               <p className="text-space-300 mb-4">
-                German equatorial mount with precise tracking for long-exposure imaging.
+                All steel and aluminum fork mount with precision gears for accurate tracking during long-exposure imaging.
                 Computer-controlled for automated targeting and guiding.
               </p>
             </div>
