@@ -171,8 +171,9 @@ export default async function HomePage() {
 
             {/* Description */}
             <p className="text-space-300 text-lg mb-8 max-w-3xl">
-              Our newest observatory location at the Texas Astronomical Society dark site in Oklahoma. 
-              Features the same telescope setup, providing access to pristine dark skies for exceptional deep sky imaging.
+              Our newest observatory is located at the Texas Astronomical Society&apos;s dark site in Caddo, Oklahoma. 
+              It is remotely operated and will be used by the TAS Teen Group for their research projects. 
+              Check back later for their exciting results!
             </p>
 
             {/* Photo Gallery */}

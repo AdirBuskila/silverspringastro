@@ -18,8 +18,8 @@ const equipmentImages = [
   },
   {
     src: '/images/equipment/new_mount2.jpg',
-    title: 'German Equatorial Mount',
-    description: 'Precision mount for accurate tracking during long-exposure imaging.',
+    title: '17" Ritchey–Chrétien Cassegrain Telescope',
+    description: 'Computer controlled all steel and aluminum fork mount with precision gears for accurate tracking during long-exposure imaging.',
   },
   {
     src: '/images/equipment/17DobScope.jpg',

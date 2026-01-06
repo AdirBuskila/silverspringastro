@@ -159,11 +159,11 @@ export default function AboutPage() {
                     Upgrading
                   </span>
                 </div>
-                <p className="text-sm text-space-400 mb-2">Oklahoma</p>
+                <p className="text-sm text-space-400 mb-2">Caddo, Oklahoma</p>
                 <p className="text-space-300 mb-3">
-                  New observatory currently being upgraded at the Texas Astronomical Society dark site. 
-                  Features the same telescope setup as SRO, providing access to pristine dark skies 
-                  and excellent imaging conditions.
+                  Our newest observatory is located at the Texas Astronomical Society&apos;s dark site in Caddo, Oklahoma. 
+                  It is remotely operated and will be used by the TAS Teen Group for their research projects. 
+                  Check back later for their exciting results!
                 </p>
                 <a 
                   href="https://www.texasastro.org/"
