@@ -29,7 +29,7 @@ export const revalidate = 60;
  * - Observatory information including Texas
  */
 export default async function HomePage() {
-  const featuredImages = (await getFeaturedImages()).slice(0, 4); // Only 4 images before links
+  const featuredImages = (await getFeaturedImages()).slice(0, 5); // Show 5 featured images including Ken's favorite NGC 253
   
   // Get image counts for each category (in parallel)
   const categoryCounts = await Promise.all(

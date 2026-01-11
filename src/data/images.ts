@@ -198,6 +198,7 @@ export const images: AstronomyImage[] = [
     description: 'The Sculptor Galaxy is a spiral galaxy in the constellation Sculptor.',
     imagePath: '/images/galaxies/NGC253_LRGB_BBO.jpg',
     thumbnailPath: '/images/galaxies/NGC253_LRGB_BBO_thumb.jpg',
+    featured: true,
   },
   {
     id: 'gal-ngc891-lrgb-h85',
