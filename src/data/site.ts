@@ -76,6 +76,6 @@ export const seoDefaults = {
   author: 'Ken Levin',
   siteUrl: 'https://www.silverspringastro.com',
   twitterHandle: undefined, // Add if Ken has a Twitter/X account
-  ogImage: '/images/hero/ken-telescope-desktop.jpg',
+  ogImage: '/images/hero/ken-telescope-desktop.png',
 };
 

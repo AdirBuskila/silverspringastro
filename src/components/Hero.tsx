@@ -26,7 +26,7 @@ export default function Hero() {
         <div className="relative w-full h-[60vh] sm:h-[70vh] lg:h-[80vh]">
           {/* Desktop image - Ken with blue telescope */}
           <Image
-            src="/images/hero/ken-telescope-desktop.jpg"
+            src="/images/hero/ken-telescope-desktop.png"
             alt="Ken Levin with his 17-inch Cassegrain telescope"
             fill
             className="object-cover object-[70%_center] hidden sm:block"
@@ -36,7 +36,7 @@ export default function Hero() {
           />
           {/* Mobile image - Cropped for portrait view */}
           <Image
-            src="/images/hero/ken-telescope-mobile.jpg"
+            src="/images/hero/ken-telescope-mobile.png"
             alt="Ken Levin with his telescope"
             fill
             className="object-cover object-center sm:hidden"
