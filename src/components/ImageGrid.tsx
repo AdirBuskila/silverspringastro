@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AstronomyImage } from '@/lib/types';
 import ImageCard from './ImageCard';
 import ImageModal from './ImageModal';
@@ -9,7 +9,8 @@ import ImageModal from './ImageModal';
  * ImageGrid Component
  * 
  * Responsive grid layout for astronomy images.
- * Handles image selection and modal display.
+ * Handles image selection and modal display. The open image is reflected in the
+ * URL (?image=<id>) so a specific image can be shared and opened directly.
  */
 interface ImageGridProps {
   images: AstronomyImage[];
@@ -17,28 +18,32 @@ interface ImageGridProps {
 }
 
 export default function ImageGrid({ images, columns = 3 }: ImageGridProps) {
-  const [selectedImage, setSelectedImage] = useState<AstronomyImage | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const handleImageClick = (image: AstronomyImage, index: number) => {
-    setSelectedImage(image);
+  const selectedImage = selectedIndex === null ? null : images[selectedIndex];
+
+  // Open the image named in the URL, if any
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('image');
+    const index = id ? images.findIndex(img => img.id === id) : -1;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL is only readable after hydration
+    if (index >= 0) setSelectedIndex(index);
+  }, [images]);
+
+  const select = (index: number | null) => {
     setSelectedIndex(index);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
+    const url = new URL(window.location.href);
+    if (index === null) url.searchParams.delete('image');
+    else url.searchParams.set('image', images[index].id);
+    window.history.replaceState(null, '', url);
   };
 
   const handlePrevious = () => {
-    const newIndex = selectedIndex > 0 ? selectedIndex - 1 : images.length - 1;
-    setSelectedIndex(newIndex);
-    setSelectedImage(images[newIndex]);
+    if (selectedIndex !== null) select(selectedIndex > 0 ? selectedIndex - 1 : images.length - 1);
   };
 
   const handleNext = () => {
-    const newIndex = selectedIndex < images.length - 1 ? selectedIndex + 1 : 0;
-    setSelectedIndex(newIndex);
-    setSelectedImage(images[newIndex]);
+    if (selectedIndex !== null) select(selectedIndex < images.length - 1 ? selectedIndex + 1 : 0);
   };
 
   const gridClasses = {
@@ -78,7 +83,7 @@ export default function ImageGrid({ images, columns = 3 }: ImageGridProps) {
           <ImageCard
             key={image.id}
             image={image}
-            onClick={() => handleImageClick(image, index)}
+            onClick={() => select(index)}
             priority={index < 6}
           />
         ))}
@@ -88,10 +93,10 @@ export default function ImageGrid({ images, columns = 3 }: ImageGridProps) {
       {selectedImage && (
         <ImageModal
           image={selectedImage}
-          onClose={handleCloseModal}
+          onClose={() => select(null)}
           onPrevious={handlePrevious}
           onNext={handleNext}
-          currentIndex={selectedIndex}
+          currentIndex={selectedIndex!}
           totalImages={images.length}
         />
       )}

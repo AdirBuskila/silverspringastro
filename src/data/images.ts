@@ -5,9 +5,10 @@
  * Contains all astronomy images with metadata.
  */
 
-import { AstronomyImage, Category, ObservatoryCode } from '@/lib/types';
+import { AstronomyImage } from '@/lib/types';
+import { captureDetails } from './captureDetails';
 
-export const images: AstronomyImage[] = [
+export const images: AstronomyImage[] = ([
   // === GALAXIES ===
   {
     id: 'gal-m51-lrgb-gradient-h85',
@@ -179,6 +180,17 @@ export const images: AstronomyImage[] = [
     thumbnailPath: '/images/galaxies/M74_LRGB_BBO_thumb.jpg',
   },
   {
+    id: 'gal-m74-lrgb-bbo-orig',
+    designation: 'M74',
+    name: 'Phantom Galaxy (earlier processing)',
+    category: 'galaxies',
+    observatory: 'BBO',
+    filters: 'LRGB',
+    description: 'The first processing of the Blackbird M74 data, from January 2007, before it was reworked in 2008.',
+    imagePath: '/images/galaxies/M74_LRGB_BBO_orig.jpg',
+    thumbnailPath: '/images/galaxies/M74_LRGB_BBO_orig.jpg',
+  },
+  {
     id: 'gal-ngc90-lrgb-h85',
     designation: 'NGC 90',
     category: 'galaxies',
@@ -271,6 +283,25 @@ export const images: AstronomyImage[] = [
     description: 'NGC 7331 is an unbarred spiral galaxy in Pegasus.',
     imagePath: '/images/galaxies/NGC7331_LRGB_H85.jpg',
     thumbnailPath: '/images/galaxies/NGC7331_LRGB_H85_thumb.jpg',
+  },
+  {
+    id: 'gal-ngc4212-g53',
+    designation: 'NGC 4212',
+    category: 'galaxies',
+    observatory: 'G53',
+    description: 'NGC 4212 is a flocculent spiral galaxy in Coma Berenices, a member of the Virgo Cluster.',
+    imagePath: '/images/galaxies/NGC4212.jpg',
+    thumbnailPath: '/images/galaxies/NGC4212_thumb.jpg',
+  },
+  {
+    id: 'gal-ngc4212-group-g53',
+    designation: 'NGC 4212',
+    name: 'NGC 4212 Galaxy Group',
+    category: 'galaxies',
+    observatory: 'G53',
+    description: 'Wide field around NGC 4212 showing its neighbouring galaxies in the Virgo Cluster.',
+    imagePath: '/images/galaxies/NGC4212_GalaxyGroup.jpg',
+    thumbnailPath: '/images/galaxies/NGC4212_GalaxyGroup_thumb.jpg',
   },
 
   // === NEBULAE ===
@@ -676,6 +707,36 @@ export const images: AstronomyImage[] = [
     imagePath: '/images/asteroids/wmap.jpg',
     thumbnailPath: '/images/asteroids/wmap.jpg',
   },
+  {
+    id: 'ast-2005we67',
+    designation: '2005 WE67',
+    name: 'Faint Asteroid Recovery',
+    category: 'asteroids',
+    observatory: 'None',
+    description: 'Recovery of 2005 WE67 on September 7: the magnitude 19.6 asteroid (circled) holds still while the stack is aligned on its motion, so the field stars trail past it.',
+    imagePath: '/images/asteroids/A2005WE67Sept7.jpg',
+    thumbnailPath: '/images/asteroids/A2005WE67Sept7.jpg',
+  },
+  {
+    id: 'ast-observation-totals',
+    designation: 'Observation Totals',
+    name: 'Cumulative Asteroid Observations, 2005–2011',
+    category: 'asteroids',
+    observatory: 'None',
+    description: 'Cumulative number of asteroid astrometry observations reported, growing from about 400 in 2005 to roughly 1,500 by 2011.',
+    imagePath: '/images/asteroids/asteroidtotals.JPG',
+    thumbnailPath: '/images/asteroids/asteroidtotals.JPG',
+  },
+  {
+    id: 'ast-motion-stack',
+    designation: 'Motion-Aligned Stack',
+    name: 'Tracking a Faint Asteroid',
+    category: 'asteroids',
+    observatory: 'None',
+    description: 'Frames stacked on the predicted motion of the asteroid: the target (circled) builds up to a point while the stars smear into trails.',
+    imagePath: '/images/asteroids/Moving.jpg',
+    thumbnailPath: '/images/asteroids/Moving.jpg',
+  },
 
   // === EXOPLANETS ===
   {
@@ -721,7 +782,14 @@ export const images: AstronomyImage[] = [
     imagePath: '/images/exoplanets/HD17156b_2.jpg',
     thumbnailPath: '/images/exoplanets/HD17156b_2.jpg',
   },
-];
+] satisfies AstronomyImage[]).map(attachCaptureDetails);
+
+// Attach acquisition details recovered from the original per-image pages
+function attachCaptureDetails(image: AstronomyImage): AstronomyImage {
+  const key = image.imagePath.split('/').pop()!.replace(/(_orig)?\.[^.]+$/, '');
+  const capture = captureDetails[key];
+  return capture ? { ...image, capture } : image;
+}
 
 // Helper functions
 export function getImagesByCategory(category: string): AstronomyImage[] {

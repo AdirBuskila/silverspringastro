@@ -19,7 +19,8 @@ export default function ObservatoryBadge({
   size = 'sm' 
 }: ObservatoryBadgeProps) {
   const observatory = getObservatory(code);
-  
+  if (code === 'None') return null;
+
   const sizeClasses = {
     sm: 'px-1.5 py-0.5 text-xs',
     md: 'px-2 py-1 text-sm',

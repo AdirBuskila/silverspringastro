@@ -1,9 +1,13 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import ImageGrid from '@/components/ImageGrid';
 import { getImagesByCategory } from '@/lib/data';
 import { getCategoryBySlug } from '@/data/categories';
+import { asteroidDiscoveries } from '@/data/asteroidDiscoveries';
+import { recoveryNights } from '@/data/recoveryLog';
+import RecoveryLog from '@/components/RecoveryLog';
 
 const category = getCategoryBySlug('asteroids')!;
 
@@ -13,25 +17,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 60;
-
-// Asteroid discovery data from original site
-const asteroidDiscoveries = [
-  { date: '2005/10/03', obs: 'H85', object: '2005TT15 (242693)', magnitude: '19.6' },
-  { date: '2005/11/06', obs: 'H85', object: '2005 VL2', magnitude: '19.1' },
-  { date: '2006/01/30', obs: 'H08', object: '2006 BN212', magnitude: '20.4' },
-  { date: '2006/03/20', obs: 'H85', object: '2006 FD', magnitude: '19.6' },
-  { date: '2007/11/08', obs: 'H08', object: '2007 VW125', magnitude: '21.6' },
-  { date: '2008/12/07', obs: 'H08', object: '2008 XW6', magnitude: '20.0' },
-  { date: '2009/01/15', obs: 'H08', object: '2009 AT16', magnitude: '21.2' },
-  { date: '2009/01/19', obs: 'H08', object: '2009 BT9', magnitude: '21.4' },
-  { date: '2009/01/19', obs: 'H08', object: '2009 BU9', magnitude: '21.8' },
-  { date: '2009/01/19', obs: 'H08', object: '2009 BV9', magnitude: '21.9' },
-  { date: '2009/10/25', obs: 'H08', object: '2009 UY91', magnitude: '20.3' },
-  { date: '2009/10/25', obs: 'H08', object: '2009 UP19', magnitude: '19.7' },
-  { date: '2009/10/25', obs: 'H08', object: '2009 UD20', magnitude: '20.0' },
-  { date: '2009/11/16', obs: 'H08', object: '2009 WU', magnitude: '20.0' },
-  { date: '2010/11/30', obs: 'G53', object: '2010 W73V', magnitude: '21.3' },
-];
 
 const asteroidStats = {
   discoveries: '40+',
@@ -143,6 +128,25 @@ export default async function AsteroidsPage() {
         </div>
       </section>
 
+      {/* Recovery survey frames */}
+      <section className="py-8">
+        <h2 className="text-xl font-bold text-space-100 mb-4">Recovery Survey Log, 2005–2006</h2>
+        <RecoveryLog nights={recoveryNights} />
+
+        <h3 className="font-semibold text-space-100 mt-8 mb-1">Checking the Measurements</h3>
+        <p className="text-sm text-space-400 mb-3">
+          Before reporting, each set of positions was checked against the predicted orbit. The lines show how far the
+          measurements fall from the orbit over the night; staying inside the shaded band means a good fit.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {['MPCCheck', 'MPCCheck0', 'MPCCheck1', 'MPCChecka'].map((name) => (
+            <div key={name} className="relative rounded-md overflow-hidden bg-white border border-space-700/50" style={{ aspectRatio: 661 / 261 }}>
+              <Image src={`/images/asteroids/${name}.jpg`} alt="Orbit-fit residual plot" fill sizes="(max-width: 640px) 100vw, 50vw" className="object-contain" />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Observatories */}
       <section className="py-8">
         <h2 className="text-xl font-bold text-space-100 mb-4">Observatories</h2>
@@ -167,43 +171,53 @@ export default async function AsteroidsPage() {
 
       {/* Discovery Table */}
       <section className="py-8">
-        <h2 className="text-xl font-bold text-space-100 mb-4">Asteroid Discoveries (Sample)</h2>
-        <div className="overflow-x-auto">
+        <h2 className="text-xl font-bold text-space-100 mb-1">Asteroid Discoveries</h2>
+        <p className="text-sm text-space-400 mb-4">
+          {asteroidDiscoveries.length} discoveries and confirmations. Arc/Obs is the observed arc and number of
+          observations (e.g. 4-opp = four oppositions, 1V = one night).
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-space-700/50">
           <table className="w-full text-sm">
-            <thead>
+            <thead className="bg-space-800/80">
               <tr className="border-b border-space-700">
-                <th className="px-4 py-2 text-left text-space-300 font-medium">Date</th>
-                <th className="px-4 py-2 text-left text-space-300 font-medium">Observatory</th>
-                <th className="px-4 py-2 text-left text-space-300 font-medium">Object</th>
-                <th className="px-4 py-2 text-right text-space-300 font-medium">Magnitude</th>
+                <th className="px-3 py-2 text-left text-space-300 font-medium">Date</th>
+                <th className="px-3 py-2 text-left text-space-300 font-medium">Obs</th>
+                <th className="px-3 py-2 text-left text-space-300 font-medium">Object</th>
+                <th className="px-3 py-2 text-left text-space-300 font-medium hidden sm:table-cell">Observer</th>
+                <th className="px-3 py-2 text-left text-space-300 font-medium hidden sm:table-cell">Measurer</th>
+                <th className="px-3 py-2 text-left text-space-300 font-medium hidden md:table-cell">Arc/Obs</th>
+                <th className="px-3 py-2 text-right text-space-300 font-medium">Mag</th>
               </tr>
             </thead>
             <tbody>
-              {asteroidDiscoveries.map((discovery, index) => (
-                <tr 
-                  key={index} 
-                  className="border-b border-space-800 hover:bg-space-800/50 transition-colors"
-                >
-                  <td className="px-4 py-2 text-space-200 font-mono text-xs">{discovery.date}</td>
-                  <td className="px-4 py-2">
+              {asteroidDiscoveries.map((d) => (
+                <tr key={d.object} className="border-b border-space-800 last:border-0 hover:bg-space-800/50 transition-colors">
+                  <td className="px-3 py-2 text-space-200 font-mono text-xs whitespace-nowrap">{d.date}</td>
+                  <td className="px-3 py-2">
                     <span className={`font-mono text-xs px-2 py-0.5 rounded ${
-                      discovery.obs === 'H85' ? 'bg-nebula-blue/20 text-nebula-blue' :
-                      discovery.obs === 'H08' ? 'bg-nebula-purple/20 text-nebula-purple' :
+                      d.obs === 'H85' ? 'bg-nebula-blue/20 text-nebula-blue' :
+                      d.obs === 'H08' ? 'bg-nebula-purple/20 text-nebula-purple' :
                       'bg-nebula-cyan/20 text-nebula-cyan'
                     }`}>
-                      {discovery.obs}
+                      {d.obs}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-space-100 font-medium">{discovery.object}</td>
-                  <td className="px-4 py-2 text-right text-space-400">{discovery.magnitude}</td>
+                  <td className="px-3 py-2 text-space-100 font-medium whitespace-nowrap">
+                    {d.url ? (
+                      <a href={d.url} target="_blank" rel="noopener noreferrer" className="text-nebula-blue hover:text-nebula-cyan">
+                        {d.object}
+                      </a>
+                    ) : d.object}
+                  </td>
+                  <td className="px-3 py-2 text-space-300 hidden sm:table-cell whitespace-nowrap">{d.observer}</td>
+                  <td className="px-3 py-2 text-space-300 hidden sm:table-cell whitespace-nowrap">{d.measurer}</td>
+                  <td className="px-3 py-2 text-space-400 font-mono text-xs hidden md:table-cell">{d.arc}</td>
+                  <td className="px-3 py-2 text-right text-space-400 tabular-nums">{d.mag.toFixed(1)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="mt-4 text-sm text-space-500 text-center">
-          Observer: K. Levin • Measurer: N. Teamo / J.C. Pelle
-        </p>
       </section>
     </Container>
   );

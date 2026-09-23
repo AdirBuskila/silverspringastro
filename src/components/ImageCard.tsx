@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { AstronomyImage } from '@/lib/types';
 import ObservatoryBadge from './ObservatoryBadge';
+import { formatDuration, totalMinutes } from '@/lib/capture';
 
 /**
  * ImageCard Component
@@ -17,8 +18,8 @@ interface ImageCardProps {
 }
 
 export default function ImageCard({ image, onClick, priority = false }: ImageCardProps) {
-  // For now, use a placeholder gradient since actual images need to be migrated
   const hasRealImage = true; // Images have been migrated from silverspringastro.com
+  const integration = totalMinutes(image.capture);
 
   return (
     <article 
@@ -94,12 +95,19 @@ export default function ImageCard({ image, onClick, priority = false }: ImageCar
           </p>
         )}
 
-        {/* Filter info */}
-        {image.filters && (
+        {/* Filter and integration time */}
+        {(image.filters || integration > 0) && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-space-400 bg-space-700 px-2 py-0.5 rounded">
-              {image.filters}
-            </span>
+            {image.filters && (
+              <span className="text-xs text-space-400 bg-space-700 px-2 py-0.5 rounded">
+                {image.filters}
+              </span>
+            )}
+            {integration > 0 && (
+              <span className="text-xs text-space-400 tabular-nums" title="Total exposure time">
+                {formatDuration(integration)} exposure
+              </span>
+            )}
           </div>
         )}
       </div>

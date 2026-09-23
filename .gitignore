@@ -29,8 +29,7 @@
 *.pem
 Thumbs.db
 
-# archived asteroid data (too many repetitive files)
-/public/images/asteroids/archive/
+# archived asteroid thumbnails (unused)
 /public/images/asteroids/thumbs/
 
 # debug

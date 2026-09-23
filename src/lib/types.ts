@@ -49,6 +49,29 @@ export interface AstronomyImage {
   technicalNotes?: string;
   // Whether this is a featured image for the homepage
   featured?: boolean;
+  // Acquisition details recovered from the original per-image pages
+  capture?: CaptureDetails;
+}
+
+/**
+ * Capture Details
+ * Acquisition data from the original site's per-image pages
+ * (e.g. "0.51-m f/8.26 Ritchey-Chretien + 4008x2672 CCD", "LRGB=300:60:36:72 min").
+ */
+export interface CaptureDetails {
+  // J2000 coordinates as written on the original page, e.g. "12h22.9m", "+15°49'"
+  ra?: string;
+  dec?: string;
+  // Constellation or host galaxy, e.g. "Leo" or "NGC 5194"
+  context?: string;
+  telescope?: string;
+  camera?: string;
+  // Observation date, YYYY-MM-DD
+  date?: string;
+  // Sub-exposure totals per filter, in minutes
+  exposures?: { filter: string; minutes: number }[];
+  notes?: string[];
+  links?: { label: string; url: string }[];
 }
 
 /**

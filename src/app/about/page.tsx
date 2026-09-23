@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
@@ -9,6 +10,13 @@ export const metadata: Metadata = {
   title: 'About',
   description: `About ${siteInfo.owner.name} and Silver Spring Observatory. Amateur astronomer and physicist specializing in CCD astro-imaging.`,
 };
+
+const starPartyPhotos = [
+  { src: '/images/equipment/YorkStarParty.jpg', caption: 'York star party' },
+  { src: '/images/equipment/dobscope.jpg', caption: 'With the Dobsonian', position: 'object-top' },
+  { src: '/images/equipment/MDStarParty.jpg', caption: 'Maryland star party' },
+  { src: '/images/about/Messier.jpg', caption: 'Messier Club certificate, 1990' },
+];
 
 /**
  * About Page
@@ -178,6 +186,40 @@ export default function AboutPage() {
                 </a>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Star Parties & visual observing */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-space-50 mb-2">
+            Star Parties &amp; Visual Observing
+          </h2>
+          <p className="text-space-300 mb-6">
+            Before the CCD cameras and remote observatories, there were star parties and a big Dobsonian.
+            On October 18, 1990 the Astronomical League recognized Ken, through the Westminster
+            Astronomical Society, for observing 70 or more Messier objects.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {starPartyPhotos.map((photo) => (
+              <a
+                key={photo.src}
+                href={photo.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-space-700/50 bg-space-800"
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.caption}
+                  fill
+                  className={`object-cover ${photo.position ?? ''} transition-transform duration-500 group-hover:scale-105`}
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
+                <span className="absolute inset-x-0 bottom-0 p-2 text-xs text-space-100 bg-gradient-to-t from-space-950/90 to-transparent">
+                  {photo.caption}
+                </span>
+              </a>
+            ))}
           </div>
         </section>
 
