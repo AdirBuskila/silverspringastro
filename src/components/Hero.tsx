@@ -5,6 +5,26 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { siteInfo } from '@/data/site';
 
+// Star field generated from a fixed seed so server and client render identical markup
+const stars = (() => {
+  let seed = 7;
+  const random = () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+  const colors = ['#fff', '#60a5fa', '#c084fc', '#fbbf24', '#22d3ee'];
+  return Array.from({ length: 60 }, () => ({
+    width: `${(random() * 3 + 1).toFixed(2)}px`,
+    height: `${(random() * 3 + 1).toFixed(2)}px`,
+    top: `${(random() * 100).toFixed(2)}%`,
+    left: `${(random() * 100).toFixed(2)}%`,
+    backgroundColor: colors[Math.floor(random() * colors.length)],
+    animationDelay: `${(random() * 5).toFixed(2)}s`,
+    animationDuration: `${(random() * 3 + 2).toFixed(2)}s`,
+    boxShadow: random() > 0.7 ? '0 0 6px currentColor' : 'none',
+  }));
+})();
+
 /**
  * Hero Component
  * 
@@ -15,6 +35,7 @@ export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fade in only after hydration
     setIsVisible(true);
   }, []);
 
@@ -85,21 +106,8 @@ export default function Hero() {
           
           {/* Stars layer */}
           <div className="absolute inset-0">
-            {[...Array(60)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full animate-twinkle"
-                style={{
-                  width: `${Math.random() * 3 + 1}px`,
-                  height: `${Math.random() * 3 + 1}px`,
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  backgroundColor: ['#fff', '#60a5fa', '#c084fc', '#fbbf24', '#22d3ee'][Math.floor(Math.random() * 5)],
-                  animationDelay: `${Math.random() * 5}s`,
-                  animationDuration: `${Math.random() * 3 + 2}s`,
-                  boxShadow: Math.random() > 0.7 ? '0 0 6px currentColor' : 'none',
-                }}
-              />
+            {stars.map((style, i) => (
+              <div key={i} className="absolute rounded-full animate-twinkle" style={style} />
             ))}
           </div>
         </div>
