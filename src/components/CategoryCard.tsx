@@ -21,6 +21,7 @@ const categoryImages: Record<string, string> = {
   'nebulae': '/images/nebulae/M27_LRGB_H85.jpg',
   'supernovae': '/images/supernovae/SN2008ax_LRGB_H85.jpg',
   'asteroids': '/images/asteroids/20051124_Fixed1a.jpg',
+  'minor-planets': '/images/asteroids/Moving.jpg',
   'exoplanets': '/images/exoplanets/HD189733.jpg',
 };
 
@@ -63,6 +64,12 @@ const categoryAccents: Record<string, { border: string; text: string; arrow: str
     border: 'border-slate-400/40 sm:border-space-700/50 group-hover:border-slate-400/60', 
     text: 'text-slate-300 sm:text-white sm:group-hover:text-slate-300',
     arrow: 'text-slate-400 sm:text-space-300 sm:group-hover:text-slate-300'
+  },
+  'minor-planets': { 
+    // Stone - faint rocky targets
+    border: 'border-stone-400/40 sm:border-space-700/50 group-hover:border-stone-400/60', 
+    text: 'text-stone-300 sm:text-white sm:group-hover:text-stone-300',
+    arrow: 'text-stone-400 sm:text-space-300 sm:group-hover:text-stone-300'
   },
   'exoplanets': { 
     // Sky blue - other worlds, discovery

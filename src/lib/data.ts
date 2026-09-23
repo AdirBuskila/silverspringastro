@@ -8,6 +8,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { images as staticImages } from '@/data/images';
 import { travelPhotos as staticTravelPhotos } from '@/data/travel';
+import { recoveryNights } from '@/data/recoveryLog';
 import { AstronomyImage, TravelPhoto, Category } from '@/lib/types';
 
 // Database types (matching Supabase schema)
@@ -168,7 +169,11 @@ export async function getImageById(id: string): Promise<AstronomyImage | null> {
  * Get category image counts (static + Supabase)
  */
 export async function getCategoryImageCount(category: string): Promise<number> {
-  const staticCount = staticImages.filter(img => img.category === category).length;
+  let staticCount = staticImages.filter(img => img.category === category).length;
+  // Minor planet survey frames live in the recovery log rather than the image list
+  if (category === 'minor-planets') {
+    staticCount += recoveryNights.reduce((sum, night) => sum + night.frames.length, 0);
+  }
   
   try {
     const supabase = await createClient();

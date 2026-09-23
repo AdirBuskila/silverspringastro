@@ -50,6 +50,13 @@ export const categories: CategoryInfo[] = [
     heroImage: '/images/asteroids/astero2.gif',
   },
   {
+    slug: 'minor-planets',
+    title: 'Minor Planets',
+    pluralTitle: 'Minor Planets',
+    description: 'A survey to recover faint, nearly lost asteroids from Silver Spring Observatory, September 2005 to February 2006: every target frame, night by night, with the checks behind each reported position.',
+    heroImage: '/images/asteroids/archive/20051002_Combo0a.jpg',
+  },
+  {
     slug: 'exoplanets',
     title: 'Exoplanets',
     pluralTitle: 'Exoplanets',

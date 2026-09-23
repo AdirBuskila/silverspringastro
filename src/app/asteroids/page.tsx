@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import ImageGrid from '@/components/ImageGrid';
@@ -7,7 +6,7 @@ import { getImagesByCategory } from '@/lib/data';
 import { getCategoryBySlug } from '@/data/categories';
 import { asteroidDiscoveries } from '@/data/asteroidDiscoveries';
 import { recoveryNights } from '@/data/recoveryLog';
-import RecoveryLog from '@/components/RecoveryLog';
+import Link from 'next/link';
 
 const category = getCategoryBySlug('asteroids')!;
 
@@ -104,47 +103,20 @@ export default async function AsteroidsPage() {
         <ImageGrid images={images} columns={3} />
       </section>
 
-      {/* Recovery of Faint Asteroids */}
-      <section className="py-8">
-        <h2 className="text-xl font-bold text-space-100 mb-4">Recovery of Faint Asteroids</h2>
-        <div className="prose prose-invert max-w-none">
-          <p className="text-space-300 leading-relaxed mb-4">
-            Asteroids that are only observed for a short time can have calculated orbits which have large 
-            uncertainties and may be in danger of being lost. Therefore, it is important to recover and 
-            observe these asteroids in order to refine their orbital parameters. While some asteroids have 
-            not been seen for years, others, although measured (even many times by the surveys), were never identified.
-          </p>
-          <p className="text-space-300 leading-relaxed mb-4">
-            Adding these to the database of unidentified objects increases the amount of computer time needed 
-            for identification exponentially. Securing the orbit of these objects allows the assignment of 
-            still unidentified measurements, and assures that the asteroid will never be lost, and it probably 
-            will be numbered at the next opposition.
-          </p>
-          <p className="text-space-300 leading-relaxed">
-            We perform targeted searches of faint objects (magnitude between 19 and 20 and beyond) with large 
-            uncertainties and in danger of being lost, using dedicated software by J.C. Pelle allowing a high 
-            confidence in the identification of the recovered object.
-          </p>
-        </div>
-      </section>
-
-      {/* Recovery survey frames */}
-      <section className="py-8">
-        <h2 className="text-xl font-bold text-space-100 mb-4">Recovery Survey Log, 2005–2006</h2>
-        <RecoveryLog nights={recoveryNights} />
-
-        <h3 className="font-semibold text-space-100 mt-8 mb-1">Checking the Measurements</h3>
-        <p className="text-sm text-space-400 mb-3">
-          Before reporting, each set of positions was checked against the predicted orbit. The lines show how far the
-          measurements fall from the orbit over the night; staying inside the shaded band means a good fit.
-        </p>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {['MPCCheck', 'MPCCheck0', 'MPCCheck1', 'MPCChecka'].map((name) => (
-            <div key={name} className="relative rounded-md overflow-hidden bg-white border border-space-700/50" style={{ aspectRatio: 661 / 261 }}>
-              <Image src={`/images/asteroids/${name}.jpg`} alt="Orbit-fit residual plot" fill sizes="(max-width: 640px) 100vw, 50vw" className="object-contain" />
-            </div>
-          ))}
-        </div>
+      {/* Link to the minor planet survey */}
+      <section className="py-4">
+        <Link
+          href="/minor-planets"
+          className="group flex items-center justify-between gap-4 p-5 rounded-xl bg-space-800/50 border border-stone-400/30 hover:border-stone-300/60 transition-colors"
+        >
+          <div>
+            <h2 className="font-semibold text-space-50 group-hover:text-stone-200">Minor Planet Recovery Survey, 2005–2006</h2>
+            <p className="text-sm text-space-400">
+              {recoveryNights.reduce((sum, n) => sum + n.frames.length, 0)} target frames from {recoveryNights.length} nights, with the orbit checks behind them
+            </p>
+          </div>
+          <span className="text-stone-300 group-hover:translate-x-1 transition-transform" aria-hidden>→</span>
+        </Link>
       </section>
 
       {/* Observatories */}

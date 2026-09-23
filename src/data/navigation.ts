@@ -14,6 +14,7 @@ export const mainNavigation: NavItem[] = [
   { label: 'Nebulae', href: '/nebulae' },
   { label: 'Supernovae', href: '/supernovae' },
   { label: 'Asteroids', href: '/asteroids' },
+  { label: 'Minor Planets', href: '/minor-planets' },
   { label: 'Exoplanets', href: '/exoplanets' },
 ];
 

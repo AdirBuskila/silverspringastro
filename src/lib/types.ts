@@ -14,6 +14,7 @@ export type Category =
   | 'nebulae'
   | 'supernovae'
   | 'asteroids'
+  | 'minor-planets'
   | 'exoplanets';
 
 // Observatory codes used throughout the original site
