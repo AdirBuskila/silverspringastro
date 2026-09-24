@@ -13,8 +13,9 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - images (public images)
+     * - spacekit (3D viewer assets)
      */
-    '/((?!_next/static|_next/image|favicon.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|images|spacekit|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
 
