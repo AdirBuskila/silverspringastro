@@ -75,7 +75,7 @@ export default function AboutPage() {
                   Asteroid (99862) Kenlevin
                 </h3>
                 <p className="text-space-300 mb-4">
-                  In recognition of contributions to astronomy, asteroid 2002 OD2 was officially 
+                  In recognition of contributions to astronomy, asteroid 2002 OD25 was officially 
                   named &quot;Kenlevin&quot; by the International Astronomical Union.
                 </p>
                 <blockquote className="pl-4 border-l-2 border-star-warm/50 text-space-200 italic mb-4">
@@ -84,7 +84,7 @@ export default function AboutPage() {
                   and operates two private observatories.&quot;
                 </blockquote>
                 <p className="font-mono text-star-warm">
-                  (99862) &quot;Kenlevin&quot; = 2002 OD2
+                  (99862) &quot;Kenlevin&quot; = 2002 OD25
                 </p>
               </div>
             </div>

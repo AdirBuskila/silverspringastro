@@ -63,8 +63,14 @@ export default async function AsteroidsPage() {
                 and operates two private observatories.&quot;
               </blockquote>
               <p className="mt-3 font-mono text-sm text-star-warm">
-                (99862) &quot;Kenlevin&quot; = 2002 OD2
+                (99862) &quot;Kenlevin&quot; = 2002 OD25
               </p>
+              <Link
+                href="/asteroids/kenlevin"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-star-warm/15 border border-star-warm/40 text-star-warm text-sm font-medium hover:bg-star-warm/25 transition-colors"
+              >
+                Explore its orbit in 3D <span aria-hidden>→</span>
+              </Link>
             </div>
           </div>
         </div>

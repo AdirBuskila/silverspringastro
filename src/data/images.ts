@@ -672,7 +672,7 @@ export const images: AstronomyImage[] = ([
     name: 'Asteroid Kenlevin',
     category: 'asteroids',
     observatory: 'H85',
-    description: 'Asteroid (99862) Kenlevin, named in honor of Ken Levin for his contributions to asteroid observations.',
+    description: 'Asteroid (99862) Kenlevin, named in honor of Ken Levin.',
     imagePath: '/images/asteroids/astero2.gif',
     thumbnailPath: '/images/asteroids/astero2.gif',
     featured: true,

@@ -304,7 +304,7 @@ export default async function HomePage() {
             <div className="inline-block p-4 rounded-lg bg-space-800/50 border border-star-warm/30">
               <p className="text-sm text-space-400 mb-1">Citation:</p>
               <p className="font-mono text-star-warm">
-                (99862) &quot;Kenlevin&quot; = 2002 OD2
+                (99862) &quot;Kenlevin&quot; = 2002 OD25
               </p>
             </div>
           </div>

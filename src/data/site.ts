@@ -27,7 +27,7 @@ export const siteInfo = {
   achievements: [
     {
       title: 'Asteroid (99862) Kenlevin',
-      description: 'Asteroid named for Ken Levin. Citation: (99862) "Kenlevin" = 2002 OD2',
+      description: 'Asteroid named for Ken Levin. Citation: (99862) "Kenlevin" = 2002 OD25',
     },
     {
       title: 'Washington Post Article',
