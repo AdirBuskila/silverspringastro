@@ -46,10 +46,21 @@ function positionFromElements(a: number, e: number, i: number, om: number, w: nu
   };
 }
 
-/** Kenlevin's heliocentric position at a Julian Date, propagated from the JPL osculating elements. */
-export function kenlevinPosition(jd: number): Vec3 {
+/** Jupiter's mean motion in degrees per day (from its mean-longitude rate). */
+const JUPITER_N_DEG_PER_DAY = JUPITER_MEAN_ELEMENTS.L[1] / DAYS_PER_CENTURY;
+
+/**
+ * Kenlevin's heliocentric position at a Julian Date, propagated from the JPL osculating elements.
+ *
+ * With `resonant`, the mean motion is locked to exactly 3/2 of Jupiter's (the 3:2 resonance) instead of
+ * the osculating value, which is ~0.8% off. Jupiter's pull keeps a Hilda's *average* rate at exactly 3:2;
+ * a pure two-body orbit ignores that and slowly drifts, turning the Hilda triangle ~4 degrees per
+ * Jupiter orbit until a corner sits on Jupiter. The resonant rate keeps the pattern steady indefinitely.
+ */
+export function kenlevinPosition(jd: number, resonant = false): Vec3 {
   const k = KENLEVIN_ELEMENTS;
-  const M = (k.ma + k.n * (jd - k.epoch)) * DEG;
+  const n = resonant ? 1.5 * JUPITER_N_DEG_PER_DAY : k.n;
+  const M = (k.ma + n * (jd - k.epoch)) * DEG;
   return positionFromElements(k.a, k.e, k.i * DEG, k.om * DEG, k.w * DEG, M);
 }
 
@@ -68,7 +79,7 @@ export function jupiterPosition(jd: number): Vec3 {
 }
 
 /** Jupiter's sidereal period in days, from the mean-longitude rate. */
-export const JUPITER_PERIOD_DAYS = (360 / JUPITER_MEAN_ELEMENTS.L[1]) * DAYS_PER_CENTURY;
+export const JUPITER_PERIOD_DAYS = 360 / JUPITER_N_DEG_PER_DAY;
 
 export interface CorotatingSample {
   jd: number;
@@ -82,23 +93,26 @@ export interface CorotatingSample {
 /**
  * Samples Kenlevin's path in a frame that rotates with Jupiter: at each step both bodies
  * are placed on their orbits, then rotated by minus Jupiter's heliocentric longitude.
+ * Kenlevin runs at the resonant mean motion (see kenlevinPosition) so the triangle doesn't drift.
  */
 export function corotatingPath(startJd: number, days: number, stepDays: number): CorotatingSample[] {
   const out: CorotatingSample[] = [];
-  for (let t = 0; t <= days; t += stepDays) {
-    const jd = startJd + t;
-    const j = jupiterPosition(jd);
-    const k = kenlevinPosition(jd);
-    const lambda = Math.atan2(j.y, j.x);
-    const c = Math.cos(lambda), s = Math.sin(lambda);
-    out.push({
-      jd,
-      x: k.x * c + k.y * s,
-      y: -k.x * s + k.y * c,
-      jupiterR: Math.hypot(j.x, j.y),
-    });
-  }
+  for (let t = 0; t <= days; t += stepDays) out.push(corotatingSample(startJd + t));
   return out;
+}
+
+/** One sample of Kenlevin's position in the frame co-rotating with Jupiter. */
+export function corotatingSample(jd: number): CorotatingSample {
+  const j = jupiterPosition(jd);
+  const k = kenlevinPosition(jd, true);
+  const lambda = Math.atan2(j.y, j.x);
+  const c = Math.cos(lambda), s = Math.sin(lambda);
+  return {
+    jd,
+    x: k.x * c + k.y * s,
+    y: -k.x * s + k.y * c,
+    jupiterR: Math.hypot(j.x, j.y),
+  };
 }
 
 /** Converts a Julian Date to a JS Date (UTC). */
