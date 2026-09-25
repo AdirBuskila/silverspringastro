@@ -71,12 +71,16 @@ export default function Hero() {
 
         {/* Name badge floating at bottom */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-space-900/80 backdrop-blur-md rounded-full border border-space-700/50">
-            <span className="text-2xl">🌟</span>
+          <Link
+            href="/asteroids/kenlevin"
+            aria-label="Ken Levin: explore the orbit of asteroid (99862) Kenlevin"
+            className="group inline-flex items-center gap-3 px-6 py-3 bg-space-900/80 backdrop-blur-md rounded-full border border-space-700/50 hover:border-star-warm/50 transition-colors"
+          >
+            <span className="text-2xl" aria-hidden>🌟</span>
             <span className="text-space-100 font-medium">Ken Levin</span>
-            <span className="text-space-500">•</span>
-            <span className="text-star-warm text-sm">Asteroid (99862)</span>
-          </div>
+            <span className="text-space-500" aria-hidden>•</span>
+            <span className="text-star-warm text-sm group-hover:underline underline-offset-4">Asteroid (99862)</span>
+          </Link>
         </div>
       </section>
 
