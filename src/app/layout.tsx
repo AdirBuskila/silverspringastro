@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -105,6 +106,12 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        {/* Clicky visitor analytics - same site ID the old site used */}
+        <Script
+          src="https://static.getclicky.com/js"
+          data-id="20023"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
