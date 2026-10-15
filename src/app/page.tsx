@@ -111,7 +111,7 @@ export default async function HomePage() {
                   Family & Travel
                 </h3>
                 <p className="text-sm text-space-400 mb-3">
-                  Personal photos and travel memories
+                  Family, high school, travel photos and home movies
                 </p>
                 <div className="flex items-center justify-end">
                   <svg className="w-5 h-5 text-fuchsia-400/80 group-hover:text-fuchsia-300 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -2,11 +2,13 @@ import { Metadata } from 'next';
 import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import TravelCategoryFilter from '@/components/TravelCategoryFilter';
+import FamilyVideos from '@/components/FamilyVideos';
+import { familyVideos } from '@/data/familyVideos';
 import { getAllTravelPhotos, getTravelAlbums, getTravelPhotosByAlbum } from '@/lib/data';
 
 export const metadata: Metadata = {
-  title: 'Travel Photos',
-  description: 'Family travel photos from around the world including Israel, Puerto Rico, Vermont, and more.',
+  title: 'Family & Travel Photos',
+  description: 'Family photos, high school and Cornell memories, home movies, and travel photos from Israel, Australia, Europe, and more.',
 };
 
 export const revalidate = 60;
@@ -14,7 +16,7 @@ export const revalidate = 60;
 /**
  * Travel Photos Page
  * 
- * Family travel and personal photography organized by album/location.
+ * Family travel and personal photography organized by album/location, plus home movies.
  * Combines static photos with dynamically uploaded photos from Supabase.
  */
 export default async function TravelPage() {
@@ -23,9 +25,29 @@ export default async function TravelPage() {
   
   // Define album display order and colors
   const albumConfig: Record<string, { color: string; description: string }> = {
+    'High School': {
+      color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30',
+      description: 'Springbrook High School, Silver Spring, MD (1968-1971) - yearbook pictures, clubs, and more.',
+    },
+    'Cornell': {
+      color: 'from-red-500/20 to-rose-500/20 border-red-500/30',
+      description: 'Cornell University, Ithaca, NY (1971-1979).',
+    },
+    'Australia': {
+      color: 'from-orange-500/20 to-yellow-500/20 border-orange-500/30',
+      description: 'Trip to Australia, 1991 - the Great Barrier Reef, Queensland rainforest, Sydney, and more.',
+    },
+    'Europe & More': {
+      color: 'from-indigo-500/20 to-sky-500/20 border-indigo-500/30',
+      description: 'Belgium, France, the Swiss Alps, and closer to home.',
+    },
+    'Star Parties': {
+      color: 'from-violet-500/20 to-fuchsia-500/20 border-violet-500/30',
+      description: 'Winter Star Party in the Florida Keys and the Mason-Dixon Star Party in York, PA.',
+    },
     'Israel': {
       color: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30',
-      description: 'Photos from trips to Israel including Jerusalem, Dead Sea, Negev Desert, and more.',
+      description: 'Photos from trips to Israel including Jerusalem, Dead Sea, Negev Desert, Wise Observatory, and more.',
     },
     'Caribbean': {
       color: 'from-teal-500/20 to-emerald-500/20 border-teal-500/30',
@@ -50,7 +72,10 @@ export default async function TravelPage() {
   };
 
   // Order albums in preferred display order
-  const orderedAlbums = ['Israel', 'Caribbean', 'Winter', 'Family', 'Education', 'Press'].filter(
+  const orderedAlbums = [
+    'Family', 'High School', 'Cornell', 'Israel', 'Australia', 'Europe & More',
+    'Caribbean', 'Winter', 'Star Parties', 'Education', 'Press',
+  ].filter(
     album => albums.includes(album)
   );
 
@@ -69,9 +94,9 @@ export default async function TravelPage() {
   return (
     <Container className="py-8">
       <PageHeader
-        title="Travel & Family Photos"
-        description="A collection of travel photography and family memories from around the world."
-        breadcrumbs={[{ label: 'Travel' }]}
+        title="Family & Travel Photos"
+        description="Family memories, high school and Cornell, home movies, and travel photography from around the world."
+        breadcrumbs={[{ label: 'Family & Travel' }]}
       />
 
       {/* Quick Stats */}
@@ -85,11 +110,25 @@ export default async function TravelPage() {
             <span className="text-2xl font-bold text-space-100">{albums.length}</span>
             <span className="text-space-400 ml-2">Albums</span>
           </div>
+          <a
+            href="#home-movies"
+            className="px-4 py-2 rounded-lg bg-space-800/50 border border-space-700 hover:border-nebula-blue/60 transition-colors"
+          >
+            <span className="text-2xl font-bold text-space-100">{familyVideos.length}</span>
+            <span className="text-space-400 ml-2">Home Movies &darr;</span>
+          </a>
         </div>
       </section>
 
       {/* Category Filter and Gallery */}
       <TravelCategoryFilter albums={albumData} allPhotos={allPhotos} />
+
+      {/* Home Movies */}
+      <section id="home-movies" className="pt-16 scroll-mt-24">
+        <h2 className="text-2xl font-bold text-space-50 mb-2">Home Movies</h2>
+        <p className="text-space-400 mb-6">Family videos from Israel, Puerto Rico, Vermont, New Hampshire, and home.</p>
+        <FamilyVideos videos={familyVideos} />
+      </section>
     </Container>
   );
 }

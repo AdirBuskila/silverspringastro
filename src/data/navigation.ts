@@ -21,7 +21,7 @@ export const mainNavigation: NavItem[] = [
 export const secondaryNavigation: NavItem[] = [
   { label: 'Equipment', href: '/equipment' },
   { label: 'About', href: '/about' },
-  { label: 'Travel', href: '/travel' },
+  { label: 'Family & Travel', href: '/travel' },
 ];
 
 export const allNavigation: NavItem[] = [

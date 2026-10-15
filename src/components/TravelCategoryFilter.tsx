@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import TravelGallery from './TravelGallery';
 import { TravelPhoto } from '@/lib/types';
 
@@ -18,14 +18,36 @@ interface TravelCategoryFilterProps {
   allPhotos: TravelPhoto[];
 }
 
+// URL-friendly album name, e.g. 'High School' -> 'high-school'
+export function albumSlug(album: string): string {
+  return album.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 /**
  * TravelCategoryFilter Component
  * 
  * Provides category filtering for travel photos.
  * Users can view all photos or filter by album/category.
+ * The selected album is kept in the URL (?album=high-school) so albums can be linked to directly.
  */
 export default function TravelCategoryFilter({ albums, allPhotos }: TravelCategoryFilterProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  // Album named in the URL (null during server render)
+  const urlAlbum = useSyncExternalStore(
+    () => () => {},
+    () => new URLSearchParams(window.location.search).get('album'),
+    () => null,
+  );
+  const [pickedCategory, setPickedCategory] = useState<string | null>(null);
+  const selectedCategory =
+    pickedCategory ?? albums.find(a => albumSlug(a.album) === urlAlbum)?.album ?? 'all';
+
+  const selectCategory = (category: string) => {
+    setPickedCategory(category);
+    const url = new URL(window.location.href);
+    if (category === 'all') url.searchParams.delete('album');
+    else url.searchParams.set('album', albumSlug(category));
+    window.history.replaceState(null, '', url);
+  };
 
   // Get current photos based on selection
   const currentPhotos = selectedCategory === 'all'
@@ -43,7 +65,7 @@ export default function TravelCategoryFilter({ albums, allPhotos }: TravelCatego
         <div className="flex flex-wrap gap-2">
           {/* All Photos Button */}
           <button
-            onClick={() => setSelectedCategory('all')}
+            onClick={() => selectCategory('all')}
             className={`
               px-4 py-2 rounded-lg text-sm font-medium transition-all
               ${selectedCategory === 'all'
@@ -60,7 +82,7 @@ export default function TravelCategoryFilter({ albums, allPhotos }: TravelCatego
           {albums.map(({ album, photos }) => (
             <button
               key={album}
-              onClick={() => setSelectedCategory(album)}
+              onClick={() => selectCategory(album)}
               className={`
                 px-4 py-2 rounded-lg text-sm font-medium transition-all
                 ${selectedCategory === album
