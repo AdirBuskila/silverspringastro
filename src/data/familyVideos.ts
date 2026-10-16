@@ -37,7 +37,6 @@ export const familyVideos: FamilyVideo[] = [
   v('beth-shikma-farm-2', 'Farm, Part 2', '0:30', 'Beth Shikma, Israel'),
   v('mall', 'Mall', '0:30', 'Israel'),
   v('puerto-rico-2003', 'Puerto Rico', '0:30', 'Puerto Rico', 'Jan 2003'),
-  v('snow-the-dog', 'Snow (the dog)', '1:36'),
   v('vermont-ski-2005-part-1', 'Sugarbush Skiing, Part 1', '10:47', 'Sugarbush, VT', '2005'),
   v('vermont-ski-2005-part-2', 'Sugarbush Skiing, Part 2', '10:47', 'Sugarbush, VT', '2005'),
   v('new-hampshire-1997-clip', 'New Hampshire', '3:10', 'New Hampshire', '1997'),
