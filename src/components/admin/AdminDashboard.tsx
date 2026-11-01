@@ -1,22 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { ManagedPhoto } from '@/lib/photoCatalog';
 import ImageUploadForm from './ImageUploadForm';
-import ImageList from './ImageList';
+import PhotoManager from './PhotoManager';
+import PasswordForm from './PasswordForm';
 
-type Tab = 'upload' | 'images' | 'settings';
+type Tab = 'photos' | 'add' | 'password';
 
-/**
- * Admin Dashboard Component
- * 
- * Main admin interface with tabs for uploading and managing images.
- */
-export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<Tab>('upload');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const supabase = createClient();
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'photos', label: 'My Photos' },
+  { id: 'add', label: 'Add a Photo' },
+  { id: 'password', label: 'Change Password' },
+];
+
+export default function AdminDashboard({ builtInPhotos }: { builtInPhotos: ManagedPhoto[] }) {
+  const [activeTab, setActiveTab] = useState<Tab>('photos');
+  const [uploadCount, setUploadCount] = useState(0);
+  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -25,65 +28,42 @@ export default function AdminDashboard() {
     router.refresh();
   };
 
-  const handleUploadSuccess = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-  const tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: 'upload', label: 'Upload Image', icon: '📤' },
-    { id: 'images', label: 'Manage Images', icon: '🖼️' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
-  ];
-
   return (
     <div>
-      {/* Header Actions */}
-      <div className="flex justify-end mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 border-b border-space-700">
+        <div className="flex flex-wrap gap-2">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-5 py-3 text-lg font-medium transition-colors border-b-2 ${
+                activeTab === tab.id
+                  ? 'text-nebula-blue border-nebula-blue'
+                  : 'text-space-300 border-transparent hover:text-space-100'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={handleLogout}
-          className="px-4 py-2 bg-space-700 text-space-200 rounded-lg hover:bg-space-600 transition-colors"
+          className="mb-2 px-4 py-2 bg-space-700 text-space-200 rounded-lg hover:bg-space-600 transition-colors"
         >
           Sign Out
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-2 mb-8 border-b border-space-700">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`
-              px-6 py-3 font-medium transition-colors relative
-              ${activeTab === tab.id 
-                ? 'text-nebula-blue' 
-                : 'text-space-400 hover:text-space-200'}
-            `}
-          >
-            <span className="mr-2">{tab.icon}</span>
-            {tab.label}
-            {activeTab === tab.id && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-nebula-blue" />
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      <div className="bg-space-800/50 rounded-xl border border-space-700 p-6">
-        {activeTab === 'upload' && (
-          <ImageUploadForm onSuccess={handleUploadSuccess} />
+      <div className="bg-space-800/50 rounded-xl border border-space-700 p-4 sm:p-6">
+        {activeTab === 'photos' && <PhotoManager key={uploadCount} builtInPhotos={builtInPhotos} />}
+        {activeTab === 'add' && (
+          <ImageUploadForm
+            builtInPhotos={builtInPhotos}
+            onSuccess={() => setUploadCount((count) => count + 1)}
+          />
         )}
-        {activeTab === 'images' && (
-          <ImageList key={refreshTrigger} />
-        )}
-        {activeTab === 'settings' && (
-          <div className="text-center py-12 text-space-400">
-            <p>Settings coming soon...</p>
-          </div>
-        )}
+        {activeTab === 'password' && <PasswordForm />}
       </div>
     </div>
   );
 }
-

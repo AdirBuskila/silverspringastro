@@ -9,11 +9,6 @@ const nextConfig: NextConfig = {
         hostname: '*.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'mlwhoofvipgwnmiiaatw.supabase.co',
-        pathname: '/storage/v1/object/public/**',
-      },
     ],
     // Configure image quality options used in the app
     qualities: [75, 85, 90, 95],

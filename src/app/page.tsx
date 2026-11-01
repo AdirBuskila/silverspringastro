@@ -5,6 +5,7 @@ import Hero from '@/components/Hero';
 import FeaturedGallery from '@/components/FeaturedGallery';
 import CategoryCard from '@/components/CategoryCard';
 import { getFeaturedImages, getCategoryImageCount } from '@/lib/data';
+import { HOME_PHOTO_COUNT } from '@/lib/photoSettings';
 import { categories } from '@/data/categories';
 import { observatories } from '@/data/observatories';
 import { siteInfo } from '@/data/site';
@@ -29,7 +30,7 @@ export const revalidate = 60;
  * - Observatory information including Texas
  */
 export default async function HomePage() {
-  const featuredImages = (await getFeaturedImages()).slice(0, 5); // Show 5 featured images including Ken's favorite NGC 253
+  const featuredImages = (await getFeaturedImages()).slice(0, HOME_PHOTO_COUNT);
   
   // Get image counts for each category (in parallel)
   const categoryCounts = await Promise.all(

@@ -1,0 +1,30 @@
+# Weekly copy of photos added through the admin page, kept as a downloadable artifact on
+# the run's page. The site's own code and built-in photos are already in this repository.
+# The weekly request also keeps the free Supabase project from pausing for inactivity.
+name: Backup uploaded photos
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/backup-uploads.mjs backup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uploaded-photos
+          path: backup
+          retention-days: 90

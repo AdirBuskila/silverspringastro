@@ -1,19 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import Image from 'next/image';
-
-const CATEGORIES = [
-  { value: 'galaxies', label: 'Galaxies' },
-  { value: 'galaxy-clusters', label: 'Galaxy Clusters' },
-  { value: 'star-clusters', label: 'Star Clusters' },
-  { value: 'nebulae', label: 'Nebulae' },
-  { value: 'supernovae', label: 'Supernovae' },
-  { value: 'asteroids', label: 'Asteroids' },
-  { value: 'exoplanets', label: 'Exoplanets' },
-  { value: 'travel', label: 'Travel Photos' },
-];
+import { ASTRONOMY_SECTIONS, ManagedPhoto } from '@/lib/photoCatalog';
+import { prepareUpload } from '@/lib/prepareUpload';
+import { fetchUploadedPhotos } from './uploadedPhotos';
 
 const OBSERVATORIES = [
   { value: 'H85', label: 'H85 - Silver Spring Observatory' },
@@ -24,306 +15,413 @@ const OBSERVATORIES = [
   { value: 'None', label: 'None / Not Applicable' },
 ];
 
+const FAMILY = 'family';
+const NEW_ALBUM = '__new__';
+const FAMILY_PREFIX = 'Family: ';
+
+const INPUT_CLASS =
+  'w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 placeholder-space-500 focus:outline-none focus:ring-2 focus:ring-nebula-blue';
+const LABEL_CLASS = 'block font-medium text-space-200 mb-2';
+
+const EMPTY_DETAILS = {
+  title: '',
+  commonName: '',
+  observatory: 'H85',
+  filters: '',
+  dateCaptured: '',
+  exposure: '',
+  location: '',
+  date: '',
+  newAlbum: '',
+  description: '',
+  featured: false,
+};
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'photo';
+}
+
+function albumsFrom(photos: ManagedPhoto[]): string[] {
+  return photos
+    .filter((photo) => photo.section.startsWith(FAMILY_PREFIX))
+    .map((photo) => photo.section.slice(FAMILY_PREFIX.length));
+}
+
 interface ImageUploadFormProps {
+  builtInPhotos: ManagedPhoto[];
   onSuccess?: () => void;
 }
 
-export default function ImageUploadForm({ onSuccess }: ImageUploadFormProps) {
-  const supabase = createClient();
+export default function ImageUploadForm({ builtInPhotos, onSuccess }: ImageUploadFormProps) {
+  const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  
-  const [formData, setFormData] = useState({
-    designation: '',
-    name: '',
-    category: 'galaxies',
-    observatory: 'SRO',
-    filters: '',
-    description: '',
-    featured: false,
-  });
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [destination, setDestination] = useState('galaxies');
+  const [album, setAlbum] = useState('');
+  const [details, setDetails] = useState(EMPTY_DETAILS);
+  const [uploadedAlbums, setUploadedAlbums] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const isFamily = destination === FAMILY;
+  const albums = useMemo(
+    () => Array.from(new Set([...albumsFrom(builtInPhotos), ...uploadedAlbums])),
+    [builtInPhotos, uploadedAlbums],
+  );
+  const selectedAlbum = album || albums[0] || NEW_ALBUM;
+
+  // Albums made by earlier uploads belong in the list too. Failing to load them is
+  // harmless: the built-in albums and "New album" are still offered.
+  useEffect(() => {
+    fetchUploadedPhotos(supabase)
+      .then((photos) => setUploadedAlbums(albumsFrom(photos)))
+      .catch((error) => console.error('Could not load uploaded albums:', error));
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+     
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const update = (change: Partial<typeof EMPTY_DETAILS>) => setDetails((current) => ({ ...current, ...change }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imageFile) {
-      setMessage({ type: 'error', text: 'Please select an image to upload' });
+    if (!file) {
+      setMessage({ ok: false, text: 'Please choose a photo first.' });
+      return;
+    }
+    const albumName = selectedAlbum === NEW_ALBUM ? details.newAlbum.trim() : selectedAlbum;
+    if (isFamily && !albumName) {
+      setMessage({ ok: false, text: 'Please type a name for the new album.' });
       return;
     }
 
-    setLoading(true);
+    setUploading(true);
     setMessage(null);
+    const storedPaths: string[] = [];
 
     try {
-      // Generate unique filename
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${formData.category}/${Date.now()}-${formData.designation.replace(/\s+/g, '_')}.${fileExt}`;
-      
-      // Upload image to Supabase Storage
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('images')
-        .upload(fileName, imageFile, {
-          cacheControl: '3600',
-          upsert: false,
+      const prepared = await prepareUpload(file);
+      const base = `${isFamily ? 'family' : destination}/${Date.now()}-${slugify(details.title)}`;
+
+      const store = async (path: string, blob: Blob) => {
+        const { error } = await supabase.storage.from('images').upload(path, blob, {
+          cacheControl: '31536000',
+          contentType: blob.type,
         });
+        if (error) throw error;
+        storedPaths.push(path);
+        return supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
+      };
 
-      if (uploadError) {
-        throw uploadError;
-      }
+      const imageUrl = await store(`${base}.${prepared.extension}`, prepared.full);
+      const thumbnailUrl = await store(`${base}_thumb.jpg`, prepared.thumbnail);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(fileName);
-
-      // Insert image record into appropriate database table
-      let dbError;
-      
-      if (formData.category === 'travel') {
-        // Travel photos go into the travel_photos table
-        const { error } = await supabase
-          .from('travel_photos')
-          .insert({
-            title: formData.designation, // Use designation as title for travel
-            location: formData.name || 'Unknown Location',
-            image_path: publicUrl,
-            thumbnail_path: publicUrl,
-            description: formData.description || null,
-            album: formData.filters || 'General', // Use filters field as album for travel
+      const description = details.description.trim() || null;
+      const { error } = isFamily
+        ? await supabase.from('travel_photos').insert({
+            title: details.title.trim(),
+            location: details.location.trim(),
+            date: details.date.trim() || null,
+            album: albumName,
+            description,
+            image_path: imageUrl,
+            thumbnail_path: thumbnailUrl,
+          })
+        : await supabase.from('images').insert({
+            designation: details.title.trim(),
+            name: details.commonName.trim() || null,
+            category: destination,
+            observatory: details.observatory,
+            filters: details.filters.trim() || null,
+            date_captured: details.dateCaptured || null,
+            exposure: details.exposure.trim() || null,
+            description,
+            featured: details.featured,
+            image_path: imageUrl,
+            thumbnail_path: thumbnailUrl,
           });
-        dbError = error;
-      } else {
-        // Astronomy images go into the images table
-        const { error } = await supabase
-          .from('images')
-          .insert({
-            designation: formData.designation,
-            name: formData.name || null,
-            category: formData.category,
-            observatory: formData.observatory,
-            filters: formData.filters || null,
-            description: formData.description || null,
-            image_path: publicUrl,
-            thumbnail_path: publicUrl,
-            featured: formData.featured,
-          });
-        dbError = error;
-      }
+      if (error) throw error;
 
-      if (dbError) {
-        throw dbError;
+      if (isFamily) {
+        setUploadedAlbums((current) => [...current, albumName]);
+        setAlbum(albumName);
       }
-
-      setMessage({ type: 'success', text: 'Image uploaded successfully!' });
-      
-      // Reset form
-      setFormData({
-        designation: '',
-        name: '',
-        category: 'galaxies',
-        observatory: 'SRO',
-        filters: '',
-        description: '',
-        featured: false,
-      });
-      setImageFile(null);
+      setMessage({ ok: true, text: `"${details.title.trim()}" is now on the website.` });
+      setDetails(EMPTY_DETAILS);
+      setFile(null);
       setPreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-
+      if (fileInputRef.current) fileInputRef.current.value = '';
       onSuccess?.();
-    } catch (error: unknown) {
-      console.error('Upload error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
-      setMessage({ type: 'error', text: errorMessage });
+    } catch (error) {
+      console.error('Upload failed:', error);
+      if (storedPaths.length > 0) {
+        const cleanup = await supabase.storage.from('images').remove(storedPaths);
+        if (cleanup.error) console.error('Could not remove partial upload:', cleanup.error);
+      }
+      const text = error instanceof Error ? error.message : 'The photo could not be uploaded. Please try again.';
+      setMessage({ ok: false, text });
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <h2 className="text-xl font-semibold text-space-50 mb-6">Upload New Image</h2>
-
-      {/* Image Upload */}
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       <div>
-        <label className="block text-sm font-medium text-space-200 mb-2">
-          Image File *
+        <label htmlFor="photo-file" className={LABEL_CLASS}>
+          1. Choose the photo
         </label>
         <input
+          id="photo-file"
           ref={fileInputRef}
           type="file"
-          accept="image/*"
-          onChange={handleImageChange}
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          onChange={(e) => {
+            const chosen = e.target.files?.[0] ?? null;
+            setFile(chosen);
+            if (!chosen) setPreview(null);
+          }}
           className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-nebula-blue file:text-space-900 file:font-semibold hover:file:bg-nebula-cyan"
           required
         />
+        <p className="text-sm text-space-400 mt-2">
+          JPG or PNG. Large photos are resized automatically for the website; your original file isn&apos;t changed.
+        </p>
         {preview && (
-          <div className="mt-4 relative aspect-video max-w-md rounded-lg overflow-hidden border border-space-600">
-            <Image
-              src={preview}
-              alt="Preview"
-              fill
-              className="object-contain"
-            />
-          </div>
+          // A local preview of the chosen file, which next/image can't optimize
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={preview} alt="Preview" className="mt-4 max-h-72 rounded-lg border border-space-600" />
         )}
       </div>
 
-      {/* Grid for form fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Designation */}
-        <div>
-          <label htmlFor="designation" className="block text-sm font-medium text-space-200 mb-2">
-            Designation * (e.g., M51, NGC 4565)
-          </label>
-          <input
-            id="designation"
-            type="text"
-            value={formData.designation}
-            onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-            className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 placeholder-space-500 focus:outline-none focus:ring-2 focus:ring-nebula-blue"
-            placeholder="M51"
-            required
-          />
-        </div>
-
-        {/* Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-space-200 mb-2">
-            Common Name (optional)
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 placeholder-space-500 focus:outline-none focus:ring-2 focus:ring-nebula-blue"
-            placeholder="Whirlpool Galaxy"
-          />
-        </div>
-
-        {/* Category */}
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-space-200 mb-2">
-            Category *
-          </label>
-          <select
-            id="category"
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 focus:outline-none focus:ring-2 focus:ring-nebula-blue"
-            required
-          >
-            {CATEGORIES.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Observatory */}
-        <div>
-          <label htmlFor="observatory" className="block text-sm font-medium text-space-200 mb-2">
-            Observatory *
-          </label>
-          <select
-            id="observatory"
-            value={formData.observatory}
-            onChange={(e) => setFormData({ ...formData, observatory: e.target.value })}
-            className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 focus:outline-none focus:ring-2 focus:ring-nebula-blue"
-            required
-          >
-            {OBSERVATORIES.map((obs) => (
-              <option key={obs.value} value={obs.value}>
-                {obs.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Filters */}
-        <div>
-          <label htmlFor="filters" className="block text-sm font-medium text-space-200 mb-2">
-            Filters (optional)
-          </label>
-          <input
-            id="filters"
-            type="text"
-            value={formData.filters}
-            onChange={(e) => setFormData({ ...formData, filters: e.target.value })}
-            className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 placeholder-space-500 focus:outline-none focus:ring-2 focus:ring-nebula-blue"
-            placeholder="LRGB, Ha, OIII..."
-          />
-        </div>
-
-        {/* Featured */}
-        <div className="flex items-center">
-          <input
-            id="featured"
-            type="checkbox"
-            checked={formData.featured}
-            onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-            className="w-5 h-5 rounded bg-space-900 border-space-600 text-nebula-blue focus:ring-nebula-blue"
-          />
-          <label htmlFor="featured" className="ml-3 text-sm font-medium text-space-200">
-            Feature on homepage
-          </label>
-        </div>
-      </div>
-
-      {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-space-200 mb-2">
-          Description (optional)
+        <label htmlFor="destination" className={LABEL_CLASS}>
+          2. Where should it appear?
         </label>
-        <textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          rows={4}
-          className="w-full px-4 py-3 bg-space-900 border border-space-600 rounded-lg text-space-100 placeholder-space-500 focus:outline-none focus:ring-2 focus:ring-nebula-blue resize-none"
-          placeholder="Additional details about the image..."
-        />
+        <select
+          id="destination"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          className={INPUT_CLASS}
+        >
+          <optgroup label="Astronomy">
+            {ASTRONOMY_SECTIONS.map((section) => (
+              <option key={section.value} value={section.value}>
+                {section.label}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Family & Travel">
+            <option value={FAMILY}>Family &amp; Travel album</option>
+          </optgroup>
+        </select>
       </div>
 
-      {/* Message */}
-      {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-green-900/30 border border-green-700/50 text-green-400' 
-            : 'bg-red-900/30 border border-red-700/50 text-red-400'
-        }`}>
-          {message.text}
+      <fieldset className="space-y-5">
+        <legend className={LABEL_CLASS}>3. Add the details</legend>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="title" className={LABEL_CLASS}>
+              {isFamily ? 'Title' : 'Object (e.g., M51, NGC 4565)'}
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={details.title}
+              onChange={(e) => update({ title: e.target.value })}
+              className={INPUT_CLASS}
+              required
+            />
+          </div>
+
+          {isFamily ? (
+            <>
+              <div>
+                <label htmlFor="album" className={LABEL_CLASS}>
+                  Album
+                </label>
+                <select
+                  id="album"
+                  value={selectedAlbum}
+                  onChange={(e) => setAlbum(e.target.value)}
+                  className={INPUT_CLASS}
+                >
+                  {albums.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                  <option value={NEW_ALBUM}>New album...</option>
+                </select>
+              </div>
+              {selectedAlbum === NEW_ALBUM && (
+                <div>
+                  <label htmlFor="new-album" className={LABEL_CLASS}>
+                    New album name
+                  </label>
+                  <input
+                    id="new-album"
+                    type="text"
+                    value={details.newAlbum}
+                    onChange={(e) => update({ newAlbum: e.target.value })}
+                    className={INPUT_CLASS}
+                    required
+                  />
+                </div>
+              )}
+              <div>
+                <label htmlFor="location" className={LABEL_CLASS}>
+                  Place (optional)
+                </label>
+                <input
+                  id="location"
+                  type="text"
+                  value={details.location}
+                  onChange={(e) => update({ location: e.target.value })}
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <label htmlFor="date" className={LABEL_CLASS}>
+                  Date (optional, e.g., 1971 or Aug 2006)
+                </label>
+                <input
+                  id="date"
+                  type="text"
+                  value={details.date}
+                  onChange={(e) => update({ date: e.target.value })}
+                  className={INPUT_CLASS}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <label htmlFor="common-name" className={LABEL_CLASS}>
+                  Common name (optional)
+                </label>
+                <input
+                  id="common-name"
+                  type="text"
+                  value={details.commonName}
+                  onChange={(e) => update({ commonName: e.target.value })}
+                  className={INPUT_CLASS}
+                  placeholder="Whirlpool Galaxy"
+                />
+              </div>
+              <div>
+                <label htmlFor="observatory" className={LABEL_CLASS}>
+                  Observatory
+                </label>
+                <select
+                  id="observatory"
+                  value={details.observatory}
+                  onChange={(e) => update({ observatory: e.target.value })}
+                  className={INPUT_CLASS}
+                >
+                  {OBSERVATORIES.map((observatory) => (
+                    <option key={observatory.value} value={observatory.value}>
+                      {observatory.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="filters" className={LABEL_CLASS}>
+                  Filters (optional)
+                </label>
+                <input
+                  id="filters"
+                  type="text"
+                  value={details.filters}
+                  onChange={(e) => update({ filters: e.target.value })}
+                  className={INPUT_CLASS}
+                  placeholder="LRGB, Ha, OIII..."
+                />
+              </div>
+              <div>
+                <label htmlFor="date-captured" className={LABEL_CLASS}>
+                  Date taken (optional)
+                </label>
+                <input
+                  id="date-captured"
+                  type="date"
+                  value={details.dateCaptured}
+                  onChange={(e) => update({ dateCaptured: e.target.value })}
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <label htmlFor="exposure" className={LABEL_CLASS}>
+                  Exposure (optional)
+                </label>
+                <input
+                  id="exposure"
+                  type="text"
+                  value={details.exposure}
+                  onChange={(e) => update({ exposure: e.target.value })}
+                  className={INPUT_CLASS}
+                  placeholder="LRGB=300:60:36:72 min"
+                />
+              </div>
+            </>
+          )}
         </div>
+
+        <div>
+          <label htmlFor="description" className={LABEL_CLASS}>
+            Description (optional)
+          </label>
+          <textarea
+            id="description"
+            value={details.description}
+            onChange={(e) => update({ description: e.target.value })}
+            rows={3}
+            className={`${INPUT_CLASS} resize-none`}
+          />
+        </div>
+
+        {!isFamily && (
+          <label className="flex items-center gap-3 text-space-200">
+            <input
+              type="checkbox"
+              checked={details.featured}
+              onChange={(e) => update({ featured: e.target.checked })}
+              className="w-5 h-5 rounded bg-space-900 border-space-600"
+            />
+            Star for the home page
+          </label>
+        )}
+      </fieldset>
+
+      {message && (
+        <p
+          role="status"
+          className={`p-4 rounded-lg border ${
+            message.ok
+              ? 'bg-green-900/30 border-green-700/50 text-green-300'
+              : 'bg-red-900/30 border-red-700/50 text-red-300'
+          }`}
+        >
+          {message.text}
+        </p>
       )}
 
-      {/* Submit */}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full py-3 px-4 bg-nebula-blue text-space-900 font-semibold rounded-lg hover:bg-nebula-cyan transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={uploading}
+        className="w-full py-3 px-4 text-lg bg-nebula-blue text-space-900 font-semibold rounded-lg hover:bg-nebula-cyan transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? 'Uploading...' : 'Upload Image'}
+        {uploading ? 'Uploading...' : 'Put It on the Website'}
       </button>
     </form>
   );
 }
-

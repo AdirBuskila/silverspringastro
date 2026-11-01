@@ -115,6 +115,12 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <Link
+                href="/admin"
+                className="text-xs text-space-400 hover:text-space-300 transition-colors"
+              >
+                Manage Photos
+              </Link>
+              <Link
                 href="https://www.sierra-remote.com/"
                 target="_blank"
                 rel="noopener noreferrer"

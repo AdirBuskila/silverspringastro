@@ -1,15 +1,22 @@
 /**
  * Data Fetching Layer
- * 
- * Combines static images (from original site) with dynamically uploaded images (from Supabase).
- * This allows the site to show both legacy content and new uploads from the admin panel.
+ *
+ * Combines static images (from original site) with dynamically uploaded images (from Supabase),
+ * and applies the admin's hide/show and home page choices from the photo_settings table.
+ *
+ * If Supabase can't be reached the site still renders from the static data. Hidden built-in
+ * photos would reappear during such an outage, so anything that must never be shown should
+ * also be removed from the static data.
  */
 
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { images as staticImages } from '@/data/images';
 import { travelPhotos as staticTravelPhotos } from '@/data/travel';
+import { familyVideos as staticFamilyVideos, FamilyVideo } from '@/data/familyVideos';
 import { recoveryNights } from '@/data/recoveryLog';
 import { AstronomyImage, TravelPhoto, Category } from '@/lib/types';
+import { isHidden, orderStarredPhotos, PhotoSetting, PhotoSettings, toPhotoSettings } from '@/lib/photoSettings';
 
 // Database types (matching Supabase schema)
 interface DBImage {
@@ -74,132 +81,84 @@ function dbTravelToTravelPhoto(dbPhoto: DBTravelPhoto): TravelPhoto {
   };
 }
 
-/**
- * Fetch all images for a category (static + Supabase)
- */
-export async function getImagesByCategory(category: string): Promise<AstronomyImage[]> {
-  // Get static images for this category
-  const staticCategoryImages = staticImages.filter(img => img.category === category);
-  
-  // Try to fetch from Supabase
+// Each loader below runs once per page render, however many times it's called.
+
+const getPhotoSettings = cache(async (): Promise<PhotoSettings> => {
   try {
     const supabase = await createClient();
-    const { data: dbImages, error } = await supabase
+    const { data, error } = await supabase.from('photo_settings').select('photo_id, hidden, featured');
+    if (error) {
+      console.error('Error fetching photo settings from Supabase:', error);
+      return toPhotoSettings([]);
+    }
+    return toPhotoSettings(data as PhotoSetting[]);
+  } catch (error) {
+    console.error('Error connecting to Supabase:', error);
+    return toPhotoSettings([]);
+  }
+});
+
+/** Every astronomy image, uploads first (newest first), before hide/show is applied. */
+const getEveryImage = cache(async (): Promise<AstronomyImage[]> => {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('images')
       .select('*')
-      .eq('category', category)
       .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching images from Supabase:', error);
-      return staticCategoryImages;
+      return staticImages;
     }
-
-    // Convert DB images to AstronomyImage format
-    const supabaseImages = (dbImages || []).map(dbImageToAstronomyImage);
-    
-    // Combine: Supabase images first (newest), then static
-    return [...supabaseImages, ...staticCategoryImages];
+    return [...(data || []).map(dbImageToAstronomyImage), ...staticImages];
   } catch (error) {
     console.error('Error connecting to Supabase:', error);
-    return staticCategoryImages;
+    return staticImages;
   }
+});
+
+/**
+ * Fetch the visible images for a category (static + Supabase)
+ */
+export async function getImagesByCategory(category: string): Promise<AstronomyImage[]> {
+  const [images, settings] = await Promise.all([getEveryImage(), getPhotoSettings()]);
+  return images.filter((img) => img.category === category && !isHidden(img.id, settings));
 }
 
 /**
- * Fetch featured images (static + Supabase)
+ * Fetch starred images in home page order (static + Supabase)
  */
 export async function getFeaturedImages(): Promise<AstronomyImage[]> {
-  // Get static featured images
-  const staticFeatured = staticImages.filter(img => img.featured);
-  
-  // Try to fetch from Supabase
-  try {
-    const supabase = await createClient();
-    const { data: dbImages, error } = await supabase
-      .from('images')
-      .select('*')
-      .eq('featured', true)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching featured images from Supabase:', error);
-      return staticFeatured;
-    }
-
-    // Convert DB images to AstronomyImage format
-    const supabaseFeatured = (dbImages || []).map(dbImageToAstronomyImage);
-    
-    // Combine: Supabase images first (newest), then static
-    return [...supabaseFeatured, ...staticFeatured];
-  } catch (error) {
-    console.error('Error connecting to Supabase:', error);
-    return staticFeatured;
-  }
+  const [images, settings] = await Promise.all([getEveryImage(), getPhotoSettings()]);
+  return orderStarredPhotos(images, settings);
 }
 
 /**
- * Get image by ID (checks both static and Supabase)
+ * Get a visible image by ID (checks both static and Supabase)
  */
 export async function getImageById(id: string): Promise<AstronomyImage | null> {
-  // Check if it's a Supabase image (prefixed with 'db-')
-  if (id.startsWith('db-')) {
-    const dbId = id.replace('db-', '');
-    try {
-      const supabase = await createClient();
-      const { data, error } = await supabase
-        .from('images')
-        .select('*')
-        .eq('id', dbId)
-        .single();
-
-      if (error || !data) return null;
-      return dbImageToAstronomyImage(data);
-    } catch {
-      return null;
-    }
-  }
-
-  // Check static images
-  const staticImage = staticImages.find(img => img.id === id);
-  return staticImage || null;
+  const [images, settings] = await Promise.all([getEveryImage(), getPhotoSettings()]);
+  if (isHidden(id, settings)) return null;
+  return images.find((img) => img.id === id) ?? null;
 }
 
 /**
  * Get category image counts (static + Supabase)
  */
 export async function getCategoryImageCount(category: string): Promise<number> {
-  let staticCount = staticImages.filter(img => img.category === category).length;
+  const count = (await getImagesByCategory(category)).length;
   // Minor planet survey frames live in the recovery log rather than the image list
   if (category === 'minor-planets') {
-    staticCount += recoveryNights.reduce((sum, night) => sum + night.frames.length, 0);
+    return count + recoveryNights.reduce((sum, night) => sum + night.frames.length, 0);
   }
-  
-  try {
-    const supabase = await createClient();
-    const { count, error } = await supabase
-      .from('images')
-      .select('*', { count: 'exact', head: true })
-      .eq('category', category);
-
-    if (error) {
-      return staticCount;
-    }
-
-    return staticCount + (count || 0);
-  } catch {
-    return staticCount;
-  }
+  return count;
 }
 
-/**
- * Fetch all travel photos (static + Supabase)
- */
-export async function getAllTravelPhotos(): Promise<TravelPhoto[]> {
-  // Try to fetch from Supabase
+const getEveryTravelPhoto = cache(async (): Promise<TravelPhoto[]> => {
   try {
     const supabase = await createClient();
-    const { data: dbPhotos, error } = await supabase
+    const { data, error } = await supabase
       .from('travel_photos')
       .select('*')
       .order('created_at', { ascending: false });
@@ -208,73 +167,40 @@ export async function getAllTravelPhotos(): Promise<TravelPhoto[]> {
       console.error('Error fetching travel photos from Supabase:', error);
       return staticTravelPhotos;
     }
-
-    // Convert DB photos to TravelPhoto format
-    const supabasePhotos = (dbPhotos || []).map(dbTravelToTravelPhoto);
-    
-    // Combine: Supabase photos first (newest), then static
-    return [...supabasePhotos, ...staticTravelPhotos];
+    return [...(data || []).map(dbTravelToTravelPhoto), ...staticTravelPhotos];
   } catch (error) {
     console.error('Error connecting to Supabase:', error);
     return staticTravelPhotos;
   }
+});
+
+/**
+ * Fetch all visible travel photos (static + Supabase)
+ */
+export async function getAllTravelPhotos(): Promise<TravelPhoto[]> {
+  const [photos, settings] = await Promise.all([getEveryTravelPhoto(), getPhotoSettings()]);
+  return photos.filter((photo) => !isHidden(photo.id, settings));
 }
 
 /**
- * Fetch travel photos by album (static + Supabase)
+ * Fetch visible travel photos by album (static + Supabase)
  */
 export async function getTravelPhotosByAlbum(album: string): Promise<TravelPhoto[]> {
-  const staticAlbumPhotos = staticTravelPhotos.filter(p => p.album === album);
-  
-  try {
-    const supabase = await createClient();
-    const { data: dbPhotos, error } = await supabase
-      .from('travel_photos')
-      .select('*')
-      .eq('album', album)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      return staticAlbumPhotos;
-    }
-
-    const supabasePhotos = (dbPhotos || []).map(dbTravelToTravelPhoto);
-    return [...supabasePhotos, ...staticAlbumPhotos];
-  } catch {
-    return staticAlbumPhotos;
-  }
+  return (await getAllTravelPhotos()).filter((photo) => photo.album === album);
 }
 
 /**
- * Get all unique albums from travel photos
+ * Get all albums that have at least one visible photo
  */
 export async function getTravelAlbums(): Promise<string[]> {
-  const staticAlbums = new Set(staticTravelPhotos.map(p => p.album).filter(Boolean) as string[]);
-  
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('travel_photos')
-      .select('album')
-      .not('album', 'is', null);
-
-    if (error) {
-      return Array.from(staticAlbums);
-    }
-
-    // Add Supabase albums
-    data?.forEach(row => {
-      if (row.album) staticAlbums.add(row.album);
-    });
-
-    return Array.from(staticAlbums);
-  } catch {
-    return Array.from(staticAlbums);
-  }
+  const albums = (await getAllTravelPhotos()).map((photo) => photo.album).filter(Boolean) as string[];
+  return Array.from(new Set(albums));
 }
 
-
-
-
-
-
+/**
+ * Fetch the visible home movies
+ */
+export async function getFamilyVideos(): Promise<FamilyVideo[]> {
+  const settings = await getPhotoSettings();
+  return staticFamilyVideos.filter((video) => !isHidden(video.id, settings));
+}

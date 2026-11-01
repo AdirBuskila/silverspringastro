@@ -3,8 +3,7 @@ import Container from '@/components/Container';
 import PageHeader from '@/components/PageHeader';
 import TravelCategoryFilter from '@/components/TravelCategoryFilter';
 import FamilyVideos from '@/components/FamilyVideos';
-import { familyVideos } from '@/data/familyVideos';
-import { getAllTravelPhotos, getTravelAlbums, getTravelPhotosByAlbum } from '@/lib/data';
+import { getAllTravelPhotos, getFamilyVideos, getTravelAlbums, getTravelPhotosByAlbum } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: 'Family & Travel Photos',
@@ -22,7 +21,8 @@ export const revalidate = 60;
 export default async function TravelPage() {
   const allPhotos = await getAllTravelPhotos();
   const albums = await getTravelAlbums();
-  
+  const familyVideos = await getFamilyVideos();
+
   // Define album display order and colors
   const albumConfig: Record<string, { color: string; description: string }> = {
     'High School': {
@@ -71,13 +71,15 @@ export default async function TravelPage() {
     },
   };
 
-  // Order albums in preferred display order
-  const orderedAlbums = [
+  // Order albums in preferred display order; albums added from the admin page go last
+  const preferredOrder = [
     'Family', 'High School', 'Cornell', 'Israel', 'Australia', 'Europe & More',
     'Caribbean', 'Winter', 'Star Parties', 'Education', 'Press',
-  ].filter(
-    album => albums.includes(album)
-  );
+  ];
+  const orderedAlbums = [
+    ...preferredOrder.filter(album => albums.includes(album)),
+    ...albums.filter(album => !preferredOrder.includes(album)),
+  ];
 
   // Pre-fetch photos for all albums with their configs
   const albumData = await Promise.all(

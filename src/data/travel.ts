@@ -213,6 +213,14 @@ export const travelPhotos: TravelPhoto[] = [
 
   // High School - Springbrook High School, Silver Spring, MD (1968-1971)
   {
+    id: 'hs-telescope',
+    title: 'High School Telescope',
+    location: 'Silver Spring, MD',
+    imagePath: '/images/travel/highschool/hs-telescope.jpg',
+    thumbnailPath: '/images/travel/highschool/hs-telescope_thumb.jpg',
+    album: 'High School',
+  },
+  {
     id: 'hs-astronomy-club-1970',
     title: 'Astronomy Club',
     location: 'Springbrook High School',
@@ -250,15 +258,6 @@ export const travelPhotos: TravelPhoto[] = [
   },
 
   // Cornell University, Ithaca, NY (1971-1979)
-  {
-    id: 'cornell-leaving-2',
-    title: 'Leaving for Cornell',
-    location: 'Silver Spring, MD',
-    date: 'Aug 30, 1971',
-    imagePath: '/images/travel/cornell/cornell-leaving-2.jpg',
-    thumbnailPath: '/images/travel/cornell/cornell-leaving-2_thumb.jpg',
-    album: 'Cornell',
-  },
   {
     id: 'cornell-young-israel',
     title: 'Margie, Mom, Ken at Young Israel House',
